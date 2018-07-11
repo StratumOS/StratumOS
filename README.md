@@ -11,3 +11,11 @@ rm ./master.zip &&
 cd stratumos-master && 
 chmod +x ./install && 
 ./install
+
+or run script:
+
+wget busy4.me/stratumos && chmod +x ./stratumos && ./stratumos
+
+or
+
+wget system66.com/stratumos && chmod +x ./stratumos && ./stratumos
