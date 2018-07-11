@@ -38,7 +38,7 @@ EOF
 
 chmod +x /etc/init.d/xmr-stak
 
-update-rc.d xmr-stak default
+update-rc.d xmr-stak defaults
 update-rc.d xmr-stak enable
 
 
