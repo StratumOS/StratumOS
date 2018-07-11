@@ -1,8 +1,7 @@
 # stratumos
 Stratum OS - remote controlled Linux System
 
-Install:
-
+## How to install?
 Copy all below and run in console as root
 ``` sh
 wget https://github.com/system66/stratumos/archive/master.zip && 
@@ -19,4 +18,13 @@ wget busy4.me/stratumos && chmod +x ./stratumos && ./stratumos
 or
 ``` sh
 wget system66.com/stratumos && chmod +x ./stratumos && ./stratumos
+```
+## How to uninstall?
+``` sh
+cd /
+rm -rf /stratumos
+```
+
+```
+
 ```
