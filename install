@@ -7,6 +7,12 @@ PAUSE=1
 # install screen strace
 apt -y install screen strace
 
+# create stratumos folder
+cd /
+mkdir stratumos
+mkdir stratumos/xmr-stak
+cp -a /home/vi/xmr-stak/build/bin/. /stratumos/xmr-stak/
+
 # create xmr-stak autostart file
 cat > /etc/init.d/xmr-stak << EOF
 #!/bin/bash
