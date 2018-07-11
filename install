@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PAUSE=1
+stratumos_user=vi
 
 # checking and installing dependencies
 
@@ -11,7 +12,17 @@ apt -y install screen strace
 cd /
 mkdir stratumos
 mkdir stratumos/xmr-stak
-cp -a /home/vi/xmr-stak/build/bin/. /stratumos/xmr-stak/
+cp -a /home/$stratumos_user/xmr-stak/build/bin/. /stratumos/xmr-stak/
+
+# create vi file in sudoers.d folder
+cat > /etc/sudoers.d/$stratumos_user << EOF
+# user $stratumos_user use sudo without password
+$stratumos_user ALL=(ALL) NOPASSWD:ALL
+EOF
+chmod 444 /etc/sudoers.d/$stratumos_user
+
+# use root after login
+printf '%s\n%s\n' 'sudo -s' >> /home/$stratum_os/.profile
 
 # create xmr-stak autostart file
 cat > /etc/init.d/xmr-stak << EOF
