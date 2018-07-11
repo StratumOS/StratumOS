@@ -13,15 +13,15 @@ cat > /etc/init.d/xmr-stak << EOF
 # chkconfig 235 99 10
 ### BEGIN INIT INFO
 # Provides: System Sixty Six 
-# Required-Start:    $local_fs $network $syslog
-# Required-Stop:     $local_fs
+# Required-Start:    \$local_fs \$network \$syslog
+# Required-Stop:     \$local_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: xmr-stak autostart
 # Description:       xmr-stak autostart
 ### END INIT INFO
 
-case "$1" in
+case "\$1" in
 	'start')
 	/usr/bin/screen -dmS xmr-stak '/stratumos/xmr-stak/xmr-stak' --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &;;
 	'stop')
