@@ -20,6 +20,7 @@ cat > /etc/init.d/xmr-stak << EOF
 # Short-Description: xmr-stak autostart
 # Description:       xmr-stak autostart
 ### END INIT INFO
+# Author: Darius Mark <darius@system66.com>
 
 case "\$1" in
 	'start')
@@ -38,7 +39,8 @@ esac
 EOF
 
 chmod +x /etc/init.d/xmr-stak
-
+echo "update-rc.d xmr-stak defaults"
 update-rc.d xmr-stak defaults
+echo "update-rc.d xmr-stak enable"
 update-rc.d xmr-stak enable
 
