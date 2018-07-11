@@ -1,0 +1,8 @@
+#!/bin/bash
+
+PAUSE=1
+
+# checking and installing dependencies
+
+# install screen strace
+apt -y install screen strace
