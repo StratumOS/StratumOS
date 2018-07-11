@@ -22,7 +22,7 @@ cat > /etc/init.d/xmr-stak << EOF
 
 case "$1" in
 	'start')
-	/usr/bin/screen -dmS xmr-stak xmr-stak --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &;;
+	/usr/bin/screen -dmS xmr-stak '/stratumos/xmr-stak/xmr-stak' --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &;;
 	'stop')
     echo "pkill xmr-stak"
 	  pkill xmr-stak
