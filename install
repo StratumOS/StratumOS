@@ -6,3 +6,33 @@ PAUSE=1
 
 # install screen strace
 apt -y install screen strace
+
+# create xmr-stak autostart file
+cat > /etc/init.d/xmr-stak << EOF
+#!/bin/bash
+# chkconfig: 345 99 10
+# description: Stratumos autostart
+#
+case "$1" in
+	'start')
+	/usr/bin/screen -dmS xmr-stak xmr-stak --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &;;
+	'stop')
+    echo "pkill xmr-stak"
+	  pkill xmr-stak
+	  screen -wipe
+	  screen -ls;;
+  *)
+	echo "Usage: $N {start|stop|status}" >&2
+	exit 1
+	;;
+
+esac
+EOF
+
+chmod +x /etc/init.d/xmr-stak
+
+update-rc.d xmr-stak default
+update-rc.d xmr-stak enable
+
+
+ 
