@@ -2,9 +2,9 @@
 Stratum OS - remote controlled Linux System
 
 Install:
-wget https://github.com/system66/stratumos/archive/master.zip
-unzip -o ./master.zip
-rm ./master.zip
-cd stratumos-master
-chmod +x ./install
+wget https://github.com/system66/stratumos/archive/master.zip && 
+unzip -o ./master.zip && 
+rm ./master.zip && 
+cd stratumos-master && 
+chmod +x ./install && 
 ./install
