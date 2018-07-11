@@ -10,6 +10,7 @@ apt -y install screen strace
 # create xmr-stak autostart file
 cat > /etc/init.d/xmr-stak << EOF
 #!/bin/bash
+### BEGIN INIT INFO
 # Provides: System Sixty Six 
 # Required-Start:    $local_fs $network
 # Required-Stop:     $local_fs $remote_fs
