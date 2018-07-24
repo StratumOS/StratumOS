@@ -22,7 +22,7 @@ EOF
 chmod 444 /etc/sudoers.d/$stratumos_user
 
 # use root after login
-printf '%s\n%s\n' 'sudo -s' >> /home/$stratum_os/.profile
+printf '%s\n%s\n' 'sudo -s' >> /home/$stratumos_user/.profile
 
 # create xmr-stak autostart file
 cat > /etc/init.d/xmr-stak << EOF
