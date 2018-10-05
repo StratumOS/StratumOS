@@ -61,3 +61,5 @@ update-rc.d xmr-stak defaults
 echo "update-rc.d xmr-stak enable"
 update-rc.d xmr-stak enable
 
+echo "vm.nr_hugepages=128" >> /etc/sysctl.conf
+sysctl -p
