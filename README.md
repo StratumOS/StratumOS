@@ -1,9 +1,15 @@
 # stratumos
 Stratum OS - (remote controlled Linux System)
 
-Install (compile) xmr-stak first.
+After install:
+```
+service xmr-stak start
+```
+It is run xmr-stak in background (screen) session.
 
-[a link] (https://github.com/system66/stratumos/blob/master/xmr-stak-install.md)
+## First of all, install (compile) xmr-stak.
+
+https://github.com/system66/stratumos/blob/master/xmr-stak-install.md
 
 ## How to install?
 Copy all below and run in console as root
