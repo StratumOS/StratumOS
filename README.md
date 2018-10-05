@@ -1,5 +1,6 @@
 # stratumos
-Stratum OS - remote controlled Linux System
+Stratum OS - (remote controlled Linux System)
+Install (compile) xmr-stak first.
 
 ## How to install?
 Copy all below and run in console as root
