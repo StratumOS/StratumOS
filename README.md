@@ -2,6 +2,7 @@
 Stratum OS - (remote controlled Linux System)
 
 Install (compile) xmr-stak first.
+
 [a link] (https://github.com/system66/stratumos/blob/master/xmr-stak-install.md)
 
 ## How to install?
