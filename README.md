@@ -12,7 +12,7 @@ It is run xmr-stak in background (screen) session.
 https://github.com/system66/stratumos/blob/master/xmr-stak-install.md
 
 ## How to install?
-Copy all below and run in console as root
+Copy all below and run in console (as root)
 ``` sh
 wget https://github.com/system66/stratumos/archive/master.zip && 
 unzip -o ./master.zip && 
@@ -21,11 +21,11 @@ cd stratumos-master &&
 chmod +x ./install && 
 ./install
 ```
-or run script:
+or run script (as root):
 ``` sh
 wget busy4.me/stratumos && chmod +x ./stratumos && ./stratumos
 ```
-or
+or (as root)
 ``` sh
 wget system66.com/stratumos && chmod +x ./stratumos && ./stratumos
 ```
