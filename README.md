@@ -1,4 +1,4 @@
-# stratumos
+# StratumOS
 Stratum OS - (remote controlled Linux System)
 
 After install:
