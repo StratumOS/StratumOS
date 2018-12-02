@@ -19,7 +19,7 @@ unzip -o ./master.zip &&
 rm ./master.zip && 
 cd stratumos-master && 
 chmod +x ./install && 
-./install
+./install.sh
 ```
 or run script (as root):
 ``` sh
