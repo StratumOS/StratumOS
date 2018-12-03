@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# watchdog
+# run as root
+
+memcheck() {
+memory_summary=$(free -m | awk 'NR==2{printf "Memory Usage: %s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
+memory_usage=$(free -m | awk 'NR==2{printf "%s\n", $3,$2,$3*100/$2 }')
+echo '' $memory_summary
+echo -e '\033[32m' $memory_usage '\033[0m'
+}
+
+clearcache() {
+cat /proc/sys/vm/drop_caches
+echo -e '\033[93m'
+free && sync && echo 3 > /proc/sys/vm/drop_caches && free
+echo -e '\033[0m'
+cat /proc/sys/vm/drop_caches
+}
+
+case "$1" in
+memory|mem-check|mem|-m)
+    memcheck
+;;
+clear|clear-cache|c|-c)
+    clearcache
+;;
+'help'|'h'|'-h')
+    echo -e "Usage: \n\
+    memory|mem-check|mem \n\
+    -h or h or help \n\
+    host-check|host \n\
+    " >&2
+;;
+*)
+    echo "Usage: $N {memory|mem-check|help|host-check}" >&2
+;;
+esac
