@@ -2,7 +2,7 @@
 
 # checking and installing dependencies
 # install screen strace
-apt -y install screen strace
+apt -y install screen strace htop
 
 # create stratumos folder
 cd /
@@ -14,12 +14,18 @@ cp -a /home/$stratumos_user/xmr-stak/build/bin/. /stratumos/xmr-stak/
 
 cat > /stratumos/xmr-stak/xmr-stak.sh << EOF
 #!/bin/bash
-/usr/bin/screen -dmS xmr-stak '/stratumos/xmr-stak/xmr-stak' --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &
+/stratumos/xmr-stak/xmr-stak --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt
 EOF
 chmod +x /stratumos/xmr-stak/xmr-stak.sh
 
+cat > /stratumos/xmr-stak/xmr-stak-screen << EOF
+#!/bin/bash
+/usr/bin/screen -dmS xmr-stak '/stratumos/xmr-stak/xmr-stak.sh'
+EOF
+chmod +x /stratumos/xmr-stak/xmr-stak-screen
+
 cat > /root/.profile  << 'EOF'
-[[ $(tty) = /dev/tty1 ]] && /stratumos/xmr-stak/xmr-stak.sh &
+[[ $(tty) = /dev/tty1 ]] && sleep 60; /stratumos/xmr-stak/xmr-stak-screen & htop
 EOF
 
 # create vi file in sudoers.d folder
