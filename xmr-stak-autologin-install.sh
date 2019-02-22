@@ -54,5 +54,3 @@ ExecStart=
 ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
 EOF
 
-echo "vm.nr_hugepages=128" >> /etc/sysctl.conf
-sysctl -p
