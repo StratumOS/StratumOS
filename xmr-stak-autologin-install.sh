@@ -43,6 +43,6 @@ rm /etc/systemd/system/getty@tty1.service.d/autologin.conf
 cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << EOF
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --autologin $USER --noclear %I $TERM
+ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
 EOF
 
