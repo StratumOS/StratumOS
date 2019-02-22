@@ -14,6 +14,7 @@ cp -a /home/$stratumos_user/xmr-stak/build/bin/. /stratumos/xmr-stak/
 
 cat > /stratumos/xmr-stak/xmr-stak.sh << EOF
 #!/bin/bash
+sysctl -w vm.nr_hugepages=266
 /stratumos/xmr-stak/xmr-stak --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt
 EOF
 chmod +x /stratumos/xmr-stak/xmr-stak.sh
@@ -37,6 +38,7 @@ chmod 444 /etc/sudoers.d/$stratumos_user
 
 # use root after login
 printf '%s\n%s\n' 'sudo -s' >> /home/$stratumos_user/.profile
+printf '%s\n%s\n' 'cd /root' >> /home/$stratumos_user/.profile
 
 rm /etc/init.d/xmr-stak
 update-rc.d xmr-stak disable
@@ -52,3 +54,5 @@ ExecStart=
 ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
 EOF
 
+echo "vm.nr_hugepages=128" >> /etc/sysctl.conf
+sysctl -p
