@@ -12,6 +12,8 @@ apt -y install screen strace
 cd /
 mkdir stratumos
 mkdir stratumos/xmr-stak
+mkdir stratumos/xmr-stak/backup
+cp -a /stratumos/xmr-stak/. /stratumos/xmr-stak/backup/
 cp -a /home/$stratumos_user/xmr-stak/build/bin/. /stratumos/xmr-stak/
 
 # create vi file in sudoers.d folder
@@ -23,6 +25,8 @@ chmod 444 /etc/sudoers.d/$stratumos_user
 
 # use root after login
 printf '%s\n%s\n' 'sudo -s' >> /home/$stratumos_user/.profile
+
+rm /etc/init.d/xmr-stak
 
 # create xmr-stak autostart file
 cat > /etc/init.d/xmr-stak << EOF
@@ -41,15 +45,20 @@ cat > /etc/init.d/xmr-stak << EOF
 
 case "\$1" in
 	'start')
-	/usr/bin/screen -dmS xmr-stak '/stratumos/xmr-stak/xmr-stak' --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &;;
+		/usr/bin/screen -dmS xmr-stak '/stratumos/xmr-stak/xmr-stak' --config /stratumos/xmr-stak/config.txt --poolconf /stratumos/xmr-stak/pools.txt &
+	;;
 	'stop')
-    echo "pkill xmr-stak"
-	  pkill xmr-stak
-	  screen -wipe
-	  screen -ls;;
-  *)
-	echo "Usage: $N {start|stop|status}" >&2
-	exit 1
+		echo "pkill xmr-stak"
+		pkill xmr-stak
+		screen -wipe
+		screen -ls
+	;;
+	'status')
+		screen -ls
+	;;
+	*)
+		echo "Usage: $N {start|stop|status}" >&2
+		exit 1
 	;;
 
 esac
