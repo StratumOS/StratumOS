@@ -1,4 +1,6 @@
 #!/bin/bash
+# service not working in Ubuntu 16
+# working well in Debian 8 and 9
 
 PAUSE=1
 stratumos_user=vi
