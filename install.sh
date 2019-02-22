@@ -34,26 +34,26 @@ cat > /etc/init.d/stratum-watchdog << EOF
 case "\$1" in
 	'start')
 		/usr/bin/screen -dmS stratum-watchdog '' &
-  ;;
+	;;
 	'stop')
-    screen -S stratum-watchdog -p 0 -X quit
+		screen -S stratum-watchdog -p 0 -X quit
 		echo "pkill stratum-watchdog"
 		pkill stratum-watchdog
 		screen -ls
-  ;;
+	;;
 	'status')
 		screen -ls
-  ;;
+	;;
 	'restart')
 		screen -ls
-    pkill stratum-watchdog
-    screen -S stratum-watchdog -p 0 -X quit
+		pkill stratum-watchdog
+		screen -S stratum-watchdog -p 0 -X quit
 		/usr/bin/screen -dmS stratum-watchdog ''
-    screen -ls
-  ;;
+		screen -ls
+	;;
 	*)
-	echo "Usage: $N {start|stop|status|restart}" >&2
-	exit 1
+		echo "Usage: $N {start|stop|status|restart}" >&2
+		exit 1
 	;;
 esac
 EOF
