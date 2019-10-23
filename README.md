@@ -1,5 +1,5 @@
-# StratumOS
-Stratum OS - (remote controlled Linux System)
+# Stratum OS 💻
+### 📱 remote controlled Linux system
 
 ## How to install
 ``` sh
@@ -28,7 +28,22 @@ cd StratumOS
 cd /
 rm -rf /stratumos
 ```
+[Stratum OS]: https://stratumos.com
 
-```
+## Where can I get the app?
+* Website [Stratum OS]
+* Apple AppStore
+* Google Play
 
-```
+## Contributing
+If you are interested in fixing issues and contributing directly to the code base, please see the document How to Contribute, which covers the following:
+
+The development workflow, including debugging and running tests
+Coding Guidelines
+Submitting pull requests
+
+## Feedback
+Discuss development and design on Gitter
+
+## License
+Copyright (c) System 66 Co. All rights reserved. Licensed under the GNU License.
