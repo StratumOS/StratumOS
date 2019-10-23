@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# one line quick commit, comment and push to github
+# author: Dariusz Porczyński
+
+gu=$(echo $(cat ./.git/config))
+case $gu in
+  *github.com:* )
+  gu=$(echo $(cat ./.git/config) | sed 's/^.*github.com://' | sed 's/\/.*//')
+  ;;
+  *github.com/* )
+  gu=$(echo $(cat ./.git/config) | sed 's/^.*github.com\///' | sed 's/\/.*//')
+  ;;
+esac
+
+echo -e "\e[95m Press ENTER if username is correct or type correct one\n\
+Current username: \e[33m"$gu"\e[0m"
+read guser
+if [ -z "$guser" ]
+then
+  guser=$gu
+fi
+echo -e "\e[30m\e[42m OK \e[0m\e[95m Github user name is:\e[33m"$guser"\e[0m"
+
+re="origin"
+echo -e "\e[95m Press ENTER if remote name is correct or type correct one\n\
+Current remote name: \e[33m"$re"\e[0m"
+read remote
+
+if [ -z "$remote" ]
+then
+  remote=$re
+fi
+echo -e "\e[30m\e[42m OK \e[0m\e[95m remote name is:\e[33m"$remote"\e[0m"
+
+git add .
+
+repo=$(echo ${PWD/*\//})
+branch=master
+echo -e "\e[95mCurrent repository:\e[0m"$repo"\e[95m, branch:\e[0m"$branch"\e[95m, \
+see changes below ... \e[0m"
+git status
+echo -e "\e[95m and type your comment below ...\e[0m"
+read comment
+
+git commit -m "$comment"
+git remote rm $remote
+git remote add $remote git@github.com:$guser/$repo
+
+git push -u $remote master
+echo -e "\e[30m\e[42m all done \e[0m bye!"
