@@ -1,5 +1,5 @@
 # Stratum OS :computer:
-### :iphone: remote controlled Linux system
+### 📱 remote controlled Linux system
 
 ## How to install
 ``` sh
