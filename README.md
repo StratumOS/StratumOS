@@ -42,8 +42,10 @@ The development workflow, including debugging and running tests
 Coding Guidelines
 Submitting pull requests
 
+[Gitter-chat]: https://gitter.im/StratumOS
+
 ## Feedback
-Discuss development and design on Gitter
+Discuss development and design on [Gitter-chat]
 
 ## License
 Copyright (c) System 66 Co. All rights reserved. Licensed under the GNU License.
