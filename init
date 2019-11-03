@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+SCRIPT=init
+touch /var/log/stratumos.log; chmod 666 /var/log/stratumos.log
+LOGFILE=/var/log/stratumos.log
+
+logline() {
+    while IFS= read -r line; do
+        echo "$(date +%F' '%T) $SCRIPT - $line" >> $LOGFILE
+    done
+}
+
+echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start init script ...\e[0m" >> $LOGFILE
+
+lsb_release -a | logline
+uname -a | logline
+
+if [ $USER != "root" ]
+	then
+  	echo "\e[41m \e[0m\e[31m Run this script as root! exit...\e[0m" | logline
+  	exit
+  else
+    echo -e "\e[42m \e[0m\e[92m root OK, continue ...\e[0m" | logline
+fi
+
+create_busyuser () {
+busyuser=busyman
+groupadd $busyuser
+useradd $busyuser -s /bin/bash -m -g $busyuser
+# allow execute crontab for busyuser
+cat > /etc/cron.allow << EOF
+`$busyuser`
+EOF
+echo -e "\e[104m \e[0m\e[94m user busyman created ...\e[0m" | logline
+}
+
+
+rm_files () {
+  if [ -z $./var/cache/apt/*.bin ];then
+  	rm /var/cache/apt/*.bin
+  fi
+  if [ -z $./var/cache/debconf/* ];then
+  	rm /var/cache/debconf/*
+  fi
+  if [ -z $./var/cache/apt/archives/*.deb ];then
+  	rm /var/cache/apt/archives/*.deb
+  fi
+  if [ -z $./var/lib/apt/lists/*.* ];then
+  	rm /var/lib/apt/lists/*.*
+  fi
+  if [ -z $./etc/apt/apt.conf ];then
+  	rm /etc/apt/apt.conf
+  fi
+}
+
+apt_files () {
+echo -e "\e[35m create /etc/apt/apt.conf and add Debian Jessie main repo ... \e[0m"
+echo 'APT::Install-Recommends "false" ; APT::Install-Suggests "false" ;' >> /etc/apt/apt.conf
+rm /etc/apt/sources.list
+echo 'deb http://ftp.debian.org/debian jessie main' >> /etc/apt/sources.list
+apt-get update && apt-get clean
+}
+
+install_ssh () {
+  apt-get -qq install -f --no-install-recommends openssh-server
+  echo -e "\e[91m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config"
+  sleep 1
+  sed -i 's/without-password/yes/g' /etc/ssh/sshd_config
+  echo -e "\e[35m apt-get --purge autoremove && apt-get clean.................." | logline
+  sleep 1
+  apt-get -qq --purge autoremove && apt-get clean
+  echo -e "\e[34m service sshd reload && service sshd status ... \e[34m" | logline
+  service sshd reload
+  service sshd status | logline
+}
+
+create_busyuser
+rm_files
+apt_files
+install_ssh
