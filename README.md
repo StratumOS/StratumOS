@@ -1,4 +1,4 @@
-# Stratum OS :computer:
+# :computer: StratumOS
 ### 📱 remote controlled Linux system
 
 ## How to install
