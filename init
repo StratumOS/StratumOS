@@ -16,7 +16,7 @@ uname -a | logline
 
 if [ $USER != "root" ]
 	then
-  	echo "\e[41m \e[0m\e[31m Run this script as root! exit...\e[0m" | logline
+  	echo -e "\e[41m \e[0m\e[31m Run this script as root! exit...\e[0m" | logline
   	exit
   else
     echo -e "\e[42m \e[0m\e[92m root OK, continue ...\e[0m" | logline
@@ -28,9 +28,12 @@ groupadd $busyuser
 useradd $busyuser -s /bin/bash -m -g $busyuser
 # allow execute crontab for busyuser
 cat > /etc/cron.allow << EOF
-`$busyuser`
+$busyuser
 EOF
+EOF 2>/dev/null # without this line code colors in Atom editor are crazy
+
 echo -e "\e[104m \e[0m\e[94m user busyman created ...\e[0m" | logline
+cat /etc/cron.allow
 }
 
 
@@ -62,18 +65,28 @@ apt-get update && apt-get clean
 
 install_ssh () {
   apt-get -qq install -f --no-install-recommends openssh-server
-  echo -e "\e[91m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config"
+  echo -e "\e[93m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config \e[0m"
   sleep 1
   sed -i 's/without-password/yes/g' /etc/ssh/sshd_config
-  echo -e "\e[35m apt-get --purge autoremove && apt-get clean.................." | logline
-  sleep 1
-  apt-get -qq --purge autoremove && apt-get clean
-  echo -e "\e[34m service sshd reload && service sshd status ... \e[34m" | logline
+  echo -e "\e[34m service sshd reload && service sshd status ... \e[0m" | logline
   service sshd reload
   service sshd status | logline
+}
+
+clean_apt () {
+  echo -e "\e[35m apt-get --purge autoremove && apt-get clean..................\e[0m" | logline
+  apt-get -qq --purge autoremove && apt-get clean
+}
+
+show_info () {
+  echo -e "\e[42m \e[30m  |-->\e[0m\e[32m Show info ... "
+  ip addr
+  echo -e "\e[35m Done ... \e[0m"
 }
 
 create_busyuser
 rm_files
 apt_files
 install_ssh
+clean_apt
+show_info

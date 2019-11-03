@@ -14,7 +14,7 @@ StratumOS is widely used for build an simple bot doing specific tasks 24 hours 7
 
 # How to install
 ``` sh
-wget stratumos.com/install && chmod +x ./install && ./install
+wget stratumos.com/init && chmod +x ./init && ./init
 ```
 
 ## Basic syntax
