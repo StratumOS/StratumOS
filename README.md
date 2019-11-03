@@ -32,5 +32,5 @@ see more in [Wiki pages](https://github.com/StratumOS/StratumOS/wiki)
 | install.sh | - | - | installation script |
 | /node/stratumos | st | /usr/bin/stratumos  | executive script | ☑️
 | /node/stratumos/bin/ | - | /usr/bin/stratumos  | executive script | ☑️
-| /node/etc/stratumos.conf | - | /usr/bin/stratumos  | executive script | ☑️
-| /node/etc/stratumos.json | - | /usr/bin/stratumos  | executive script | ☑️
+| /node/etc/stratumos.conf | - | /usr/bin/stratumos  | config file | ☑️
+| /node/etc/stratumos.json | - | /usr/bin/stratumos  | json file | ☑️

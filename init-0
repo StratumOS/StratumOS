@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+# pre-install script, clean distribution
+# prepare fresh minimal, clean distro Debian 8 in this case
+# wget --no-check-certificate https://stratumos.com/init-0 && chmod 755 ./init-0
+# ./init-0
+
+echo -e "\e[44m Cleaning distribution up..... \e[0m"
+echo -e "\e[104m Remove packages and install ssh server....\e[0m"
+SCRIPT=init-0
+touch /var/log/stratumos.log; chmod 666 /var/log/stratumos.log
+LOGFILE=/var/log/stratumos.log
+
+logline() {
+    while IFS= read -r line; do
+        echo "$(date +%F' '%T) $SCRIPT - $line" >> $LOGFILE
+    done
+}
+
+echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start init-0 script ...\e[0m" >> $LOGFILE
+
+lsb_release -a | logline
+uname -a | logline
+
+if [ $USER != "root" ]
+	then
+	echo "Run this script as root! exit..." | logline
+	exit
+fi
+
+busyuser=busyman
+groupadd $busyuser
+useradd $busyuser -s /bin/bash -m -g $busyuser
+
+# allow execute crontab for busyuser
+cat > /etc/cron.allow << EOF
+$busyuser
+EOF
+
+rm_files () {
+if [ -z $./var/cache/apt/*.bin ];then
+	rm /var/cache/apt/*.bin
+fi
+if [ -z $./var/cache/debconf/* ];then
+	rm /var/cache/debconf/*
+fi
+if [ -z $./var/cache/apt/archives/*.deb ];then
+	rm /var/cache/apt/archives/*.deb
+fi
+if [ -z $./var/lib/apt/lists/*.* ];then
+	rm /var/lib/apt/lists/*.*
+fi
+if [ -z $./etc/apt/apt.conf ];then
+	rm /etc/apt/apt.conf
+fi
+}
+rm_files
+
+echo -e "\e[35m create /etc/apt/apt.conf \e[0m"
+echo 'APT::Install-Recommends "false" ; APT::Install-Suggests "false" ;' >> /etc/apt/apt.conf
+sleep 1
+
+#add main repo Debian Jessie
+rm /etc/apt/sources.list
+echo 'deb http://ftp.debian.org/debian jessie main' >> /etc/apt/sources.list
+
+sleep 1
+echo -e "\e[35m configure grub........................................................ \e[0m"
+sleep 1
+sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g' /etc/default/grub
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=0 splash"/g' /etc/default/grub
+update-grub
+sleep 1
+echo -e "\e[37m do not show messages durring boot........\e[0m" | logline
+echo -e "\e[36m Disable blank console... \e[0m" | logline
+
+sed -i 's/exit 0//g' /etc/rc.local
+printf '%s\n%s\n' 'dmesg --console-off' 'exit 0' >> /etc/rc.local | logline
+sed -i 's/#kernel.printk/kernel.printk/g' /etc/sysctl.conf | logline
+
+if [ -e /etc/default/rcS ];then
+	echo -e "\e[33m modify /etc/default/rcS ... \e[0m" | logline
+	sed -i 's/#VERBOSE/VERBOSE/g' /etc/default/rcS
+else
+	echo -e "\e[33m Create /etc/default/rcS file with VERBOSE=no ... \e[0m" | logline
+	touch /etc/default/rcS
+	echo 'VERBOSE=no' >> /etc/default/rcS
+fi
+
+sed -i 's/journal+console/journal/g' /lib/systemd/system/systemd-fsck-root.service
+sed -i 's/journal+console/journal/g' /lib/systemd/system/systemd-fsck@.service
+
+echo -e "\e[35m remove unneeded packages......................................................."
+echo -e "\e[36m apt-get -qq purge acpi acpid eject"
+sleep 1
+apt-get -qq purge acpi acpid eject ispell
+apt-get -qq purge eject
+apt-get -qq purge ispell
+echo -e "\e[93m apt-get -qq purge gcc-4.8-base:amd64 .........................."
+sleep 1
+apt-get -qq purge gcc-4.8-base:amd64
+#echo "apt-get -qq purge gcc-4.9-base:amd64"
+#apt-get -qq purge gcc-4.9-base:amd64
+echo -e "\e[94m apt-get -qq purge gettext-base laptop-detect manpages nano tasksel traceroute usbutils ..."
+sleep 1
+apt-get -qq purge gettext-base laptop-detect manpages nano tasksel traceroute usbutils
+echo -e "\e[95m apt-get -qq purge vim-common vim-tiny.................................."
+sleep 1
+apt-get -qq purge vim-common vim-tiny
+echo -e "\e[96m rm -rf /usr/share/man/?? && rm -rf /usr/share/man/??_*"
+sleep 1
+rm -rf /usr/share/man/?? && rm -rf /usr/share/man/??_*
+
+# update repository & clean apt
+# install openssh-server
+echo -e "\e[32m apt-get update && apt-get clean && apt-get install -f --no-install-recommends openssh-server\e[0m" | logline
+sleep 1
+
+apt-get update && apt-get clean
+apt-get -qq install -f --no-install-recommends openssh-server dialog
+echo -e "\e[91m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config"
+sleep 1
+sed -i 's/without-password/yes/g' /etc/ssh/sshd_config
+echo -e "\e[35m apt-get --purge autoremove && apt-get clean.............................................."
+sleep 1
+apt-get -qq --purge autoremove && apt-get clean
+
+# Autologin as $busyuser without login manager in console tty1...
+autologin_user () {
+echo -e "\e[32m Autologin as $busyuser without login manager in console tty1...\e[0m"
+sleep 1
+mkdir -pv /etc/systemd/system/getty@tty1.service.d
+rm /etc/systemd/system/getty@tty1.service.d/autologin.conf
+cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $busyuser --noclear %I $TERM
+EOF
+}
+
+# Autologin as root without login manager in console tty2...
+autologin_root () {
+echo -e "\e[33m Autologin as root without login manager in console tty2...\e[0m"
+sleep 1
+mkdir -pv /etc/systemd/system/getty@tty2.service.d
+rm /etc/systemd/system/getty@tty2.service.d/autologin.conf
+#sed -i 's/--noclear/--autologin root --noclear/g' /lib/systemd/system/getty@.service
+cat > /etc/systemd/system/getty@tty2.service.d/autologin.conf << 'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
+EOF
+}
+
+autostart_user () {
+cat > /home/$busyuser/.profile  << EOF
+[[ $(tty) = /dev/tty1 ]] && setterm -blank 0 -powersave off && /root/init-dialog
+EOF
+chown $busyuser:$busyuser /home/busyman/.profile
+}
+
+autostart_root () {
+cat > /root/.profile  << EOF
+[[ $(tty) = /dev/tty2 ]] && setterm -blank 0 -powersave off &&
+EOF
+}
+
+autologin_user
+autostart_user
+
+autologin_root
+
+echo -e "\e[90m set the correct default.target to ensure the system boots to the console tty1"
+sleep 1
+systemctl set-default multi-user.target
+
+# and final step in this file, run init-1 (or run init-1 later... cron?)
+# ./init-1
+
+# Remove apt cache and files....
+rm_files
+
+echo -e "\e[34m service sshd reload && service sshd status"
+service sshd reload && service sshd status
+ip addr | grep eth0
+df
+echo -e "\e[32m New groups:"
+getent group $busyuser
+ls -la /opt/$PROJECT
+echo -e "\e[0m"
+
+echo -e "\e[36m Download init-* files.........\e[0m"
+wget -nv --no-check-certificate https://busy4.me/init-1 -O /root/init-1
+wget -nv --no-check-certificate https://busy4.me/init-update -O /root/init-update
+wget -nv --no-check-certificate https://busy4.me/init-dialog -O /root/init-dialog
+chmod +x /root/init-*
+cd /root
+ls -la /root
+
+echo -e "\e[44m All done... To install Xorg and browser run /root/init-1 command ........\e[0m"

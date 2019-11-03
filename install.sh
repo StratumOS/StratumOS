@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PAUSE=1
 stratumos_user=vi
@@ -22,7 +22,7 @@ cat > /etc/init.d/stratum-watchdog << EOF
 #!/bin/bash
 # chkconfig 235 99 10
 ### BEGIN INIT INFO
-# Provides: System Sixty Six 
+# Provides: System Sixty Six
 # Required-Start:    \$local_fs \$network \$syslog
 # Required-Stop:     \$local_fs
 # Default-Start:     2 3 4 5
