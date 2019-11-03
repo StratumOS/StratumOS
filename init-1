@@ -1,0 +1,265 @@
+#!/usr/bin/env bash
+# pre-install script init-1, install dependencies, X server, openbox as Windows Manager
+# google-chrome Google Chrome as www browser
+SCRIPT=init-1
+LOGFILE=/var/log/stratumos.log
+chmod 666 /var/log/stratumos.log
+
+# logrotate, add task to logrotate
+# rotate logs daily, was problem with compare logs when log is a big file
+echo -e "\e[44m ................... update logrotate \e[0m"
+rm /etc/logrotate.d/stratumos 2>/dev/null
+mkdir /var/log/stratumos 2>/dev/null
+cat > /etc/logrotate/stratumos << EOF
+/var/log/stratumos.log
+{
+        rotate 7
+        size 1M
+        missingok
+        dateext
+        copytruncate
+		olddir /var/log/stratumos
+}
+
+EOF
+
+# add user and group "busyman" and 'admin"
+ADMIN_USER=admin
+BUSYUSER=busyman
+
+logline() {
+    while IFS= read -r line; do
+        echo "$(date +%F' '%T) $SCRIPT - $line" | tee -a $LOGFILE
+    done
+}
+echo "$(date +%F' '%T) $SCRIPT - Start init-1 script ..." | logline
+
+if [ $USER != "root" ]
+	then
+		echo -e "\e[31mRun this script as root! exit...\e[0m"
+		echo "Run this script as root! exit..." | logline
+		exit 1
+	else
+		echo -e "\e[32mRun OK as root...\e[0m" | logline
+fi
+
+groupadd $ADMIN_USER >> $LOGFILE
+useradd $ADMIN_USER -s /bin/bash -m -g $ADMIN_USER | logline
+groupadd busyman >> $LOGFILE
+useradd busyman -s /bin/bash -m -g busyman | logline
+# add directory for write any files by users, chmod 777
+# don't want to see any files in busyman directory,
+# sometime it's seen on the screen when somehow open file dialog apears
+# in chrome Ctrl+o
+
+# create directory with access for users
+mkdir /opt/busy 2>/dev/null
+chmod 777 /opt/busy
+mkdir /opt/busy/{files,images,sounds,videos} 2>/dev/null
+chmod 777 /opt/busy/{files,images,sounds,videos}
+# empty file for blank clipboard
+# touch /opt/busy/files/blank
+
+# add file .bash_aliases to user account
+cat > /home/busyman/.bash_aliases << EOF
+# Command aliases for busyman
+alias ls="ls --color -lAGbh --time-style='+%b %d %Y %H:%M'"
+EOF
+
+# add file .bash_aliases to root account
+cat > /root/.bash_aliases << EOF
+# Command aliases for root
+alias ls="ls --color -lAGbh --time-style='+%b %d %Y %H:%M'"
+EOF
+
+echo -e "\e[31m Remove init-0 file..................... \e[0m" >> $LOGFILE
+rm /root/init-0 >> $LOGFILE
+
+lsb_release -a | logline
+uname -a | logline
+
+# install X, browser, and other packages
+# apt-get update && apt-get install -y software-properties-common python-software-properties
+echo -e "\e[100m Install software-properties-common ... \e[0m" | logline
+apt-get install -y software-properties-common | logline # for Debian
+echo -e "\e[100m Install wget curl ... \e[0m" | logline
+apt-get install -y wget curl | logline
+wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - | logline
+add-apt-repository 'deb http://dl.google.com/linux/chrome/deb/ stable main' | logline
+apt-get update | logline >> $LOGFILE
+echo -e "\e[100m Install xorg ... \e[0m" | logline
+apt-get install -y -V --no-install-recommends xorg | logline >> $LOGFILE # without lightdm for now
+echo -e "\e[100m Install openbox google-chrome-stable ... \e[0m" | logline
+apt-get install -y --no-install-recommends openbox google-chrome-stable | logline
+echo -e "\e[100m Install xdotool wmctrl xcompmgr feh nginx bc ntp zenity xclip ntpdate scrot screen sqlite3 Xvfb ... \e[0m" | logline
+apt-get install -y xdotool wmctrl xcompmgr feh nginx bc ntp zenity xclip ntpdate scrot screen sqlite3 Xvfb tint2 | logline >> $LOGFILE
+
+# coppied from init-2
+apt-get -y install python python-dev python-tk
+apt-get install -y python-pip python-xlib python-pillow scrot
+pip install setuptools -U # update 08-2019,
+pip install pyautogui # need for automate keys, mouse, recognise pictures on the screen
+
+#hostnamectl seems to need dbus, hostnamectl used for change hostname
+echo -e "\e[100m Install dbus ... \e[0m" | logline
+apt-get install -y dbus | logline >> $LOGFILE
+
+# change hostname to unique name, pattern: busy-UUID
+echo -e "\e[100m Change hostname maching to product_uuid... \e[0m" | logline
+old_hostname=$(cat /etc/hostname)
+new_hostname=busy-$(cat /sys/class/dmi/id/product_uuid)
+hostnamectl set-hostname "$new_hostname"
+echo -e "\e[36m   ......update /etc/hosts file \e[0m"
+cp /etc/hosts /etc/hosts.bak
+sed -i "/\s$old_hostname/d" /etc/hosts
+echo "127.0.1.1 $new_hostname" >> /etc/hosts
+
+sysctl vm.swappiness=10
+# set swappiness permamently
+echo "vm.swappiness = 10" >> /etc/sysctl.conf
+
+
+# backorts need for install salt-common which can't be installed without python-systemd
+echo 'deb http://deb.debian.org/debian jessie-backports main' >> /etc/apt/sources.list
+
+#add main repo & install SaltStack
+echo -e "\e[100m Saltstack install Start ... \e[0m" | logline
+rm /etc/apt/sources.list.d/saltstack.list 2>/dev/null | logline
+echo 'deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main' >> /etc/apt/sources.list.d/saltstack.list | logline
+echo -e "\e[100m repo Saltstack certificate ... \e[0m" | logline
+wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - | logline
+apt-get update
+apt-get install -y salt-common salt-minion
+rm /etc/salt/minion
+cat > /etc/salt/minion  << EOF
+master: 192.168.121.155
+EOF
+echo -e "\e[100m Saltstack install End ... \e[0m" | logline
+
+# install ffmpeg ffplay for streaming desktop
+echo -e "\e[100m Install ffmpeg... \e[0m" | logline
+rm /etc/apt/sources.list.d/deb-multimedia.list 2>/dev/null
+cat > /etc/apt/sources.list.d/deb-multimedia.list  << EOF
+deb http://www.deb-multimedia.org jessie main non-free
+deb-src http://www.deb-multimedia.org jessie main non-free
+EOF
+apt-get update
+apt-get -y --force-yes install deb-multimedia-keyring
+apt-get update
+apt-get install -y build-essential libmp3lame-dev libvorbis-dev libtheora-dev libspeex-dev yasm pkg-config libfaac-dev libopenjpeg-dev libx264-dev
+apt-get install -y libav-tools
+
+echo 'Download local webservice menu file.....................' | logline
+wget -nv --no-check-certificate https://busy4.me/var/www/html/index.html -O /var/www/html/index.html | logline
+
+echo -e "\e[33m Change autostart startx in user busyman .profile file.........................\e[0m" | logline
+#sed -i 's/date/startx/g' /home/busyman/.profile | logline
+
+# run X in tty1 (after autologin)
+rm /home/$BUSYUSER/.profile
+cat > /home/$BUSYUSER/.profile  << 'EOF'
+[[ $(tty) = /dev/tty1 ]] && setterm -blank 0 -powersave off && startx
+EOF
+chown $BUSYUSER:$BUSYUSER /home/busyman/.profile | logline
+
+# download big files
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy/images/wallpaper.jpg -O /opt/busy/images/wallpaper.jpg | logline
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy/images/wall_black_with_vertical_logo.jpg -O /opt/busy/images/wall_black_with_vertical_logo.jpg | logline
+feh --bg-scale /opt/busy/images/wallpaper.jpg | logline
+
+#echo 'Run google-chrome.sh script.....................'
+rm -R /home/busyman/.config/openbox/ | logline
+mkdir -pv /home/busyman/.config/openbox/ | logline
+echo -e "\e[36m Copy openbox config files.....................\e[0m" | logline
+cp -R /etc/xdg/openbox /home/busyman/.config | logline
+chown -R busyman:busyman /home/busyman/.config | logline
+
+rm -R /home/busyman/.config/openbox/autostart | logline
+cat > /home/busyman/.config/openbox/autostart << EOF
+# Programs that will run after Openbox windows manager has started
+xrandr --output default --mode 800x600 &&
+xrandr --output Virtual1 --mode 800x600 &&
+feh --bg-scale /opt/busy/images/wallpaper.jpg &&
+xset -dpms &&
+xset s off &&
+xcompmgr &
+/opt/busy4me/frame00 &
+EOF
+
+cat > /home/busyman/.config/openbox/autostart << EOF
+# Programs that will run after Openbox windows manager has started
+xrandr --output default --mode 800x600 &&
+feh --bg-scale /opt/busy/images/wallpaper.jpg &&
+xset -dpms &&
+xset s off &&
+xcompmgr &
+/opt/busy4me/frame00 &
+EOF
+chown busyman:busyman /home/busyman/.config/openbox/*
+chmod +x /home/busyman/.config/openbox/autostart | logline
+
+cat > /usr/share/xsessions/busyman.desktop << EOF
+[Desktop Entry]
+Version=1.0
+Name=busyman
+Exec=default
+Icon=
+Type=Application
+EOF
+
+# download or update particular service (in this case project "busy4me")
+PROJECT="busy4me"
+rm -Rf /opt/$PROJECT
+mkdir /opt/$PROJECT
+mkdir /opt/$PROJECT/log
+ln -s /var/log/busy4me.log /opt/busy4me/busy4me.log
+export PATH=$PATH:/opt/$PROJECT
+cd /opt/$PROJECT
+echo "wget -q --no-check-certificate https://busy4.me/node/opt/busy4me/*"
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy4me/update -O /opt/busy4me/update | logline
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy4me/config -O /opt/busy4me/config | logline
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy4me/windows-init -O /opt/busy4me/windows-init | logline
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy4me/chrome-init -O /opt/busy4me/chrome-init | logline
+wget -nv --no-check-certificate https://busy4.me/node/opt/busy4me/menu-init -O /opt/busy4me/menu-init | logline
+chmod +x /opt/busy4me/*
+ls -la /opt/$PROJECT
+echo "Start /opt/busy4me/update..." | logline
+/bin/bash /opt/busy4me/update --full | logline
+
+echo -e "\e[32m New groups: \e[33m" | logline
+getent group $ADMIN_USER
+getent group busyman | logline
+
+# add tasks to crontab
+# compare logs in every 10 min and reboot if notting happened
+echo -e "\e[44m ................... update crontab \e[0m"
+rm /etc/cron.d/compare_logs_reboot 2>/dev/null
+cat > /etc/cron.d/compare_logs_reboot  << 'EOF'
+*/10 * * * * root /bin/bash /opt/busy4me/compare_logs_reboot.sh
+*/5 * * * * root export DISPLAY=:0 && export XAUTHORITY="/home/busyman/.Xauthority" && /bin/bash /opt/busy4me/windows-check.sh
+EOF
+
+date | logline
+# update date before login....
+echo -e "\e[36m update date....\e[33m" | logline
+ntpdate -s time.nist.gov | logline
+date | logline
+sleep 1
+echo -e "\e[35m apt-get --purge autoremove && apt-get clean.............................................."
+sleep 1
+
+apt-get -y remove exim4 exim4-base exim4-config exim4-daemon-light
+apt-get -y autoremove exim4
+rm -r /var/log/exim4/
+rm -r /var/spool/mail/*
+
+apt-get -qq --purge autoremove && apt-get clean
+
+
+echo -e "\e[32m All done......................\e[0m" | logline
+echo -e "Next to do: Run 'reboot' and should start google-chrome browser...." | logline
+echo -e "Logifile: /var/log/busy4me.log" | logline
+echo -e "\e[31m Reboot in 5s......................\e[0m" | logline
+
+sleep 5
+reboot

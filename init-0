@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pre-install script, clean distribution
+# pre-install script init-0, clean distribution, remove unnecessary things
 # prepare fresh minimal, clean distro Debian 8 in this case
 # wget --no-check-certificate https://stratumos.com/init-0 && chmod 755 ./init-0
 # ./init-0
