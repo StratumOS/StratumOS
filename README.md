@@ -24,3 +24,13 @@ stratum [place:action:what] [--parameter:value]
 ```
 
 see more in [Wiki pages](https://github.com/StratumOS/StratumOS/wiki)
+
+# Files content
+
+| File | Alias | Symlink | Description | |
+|---|---|:---:|:---:|:---:|
+| install.sh | - | - | installation script |
+| /node/stratumos | st | /usr/bin/stratumos  | executive script | ☑️
+| /node/stratumos/bin/ | - | /usr/bin/stratumos  | executive script | ☑️
+| /node/etc/stratumos.conf | - | /usr/bin/stratumos  | executive script | ☑️
+| /node/etc/stratumos.json | - | /usr/bin/stratumos  | executive script | ☑️

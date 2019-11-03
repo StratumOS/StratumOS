@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# one line quick commit, comment and push to github
+# one command line quick commit, comment and push directly to the Github.com master branch
 # author: Dariusz Porczyński
 
 gu=$(echo $(cat ./.git/config))
