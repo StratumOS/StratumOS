@@ -7,28 +7,28 @@ LOGFILE=/var/log/stratum.log
 BACKUP=/var/backups/stratum
 mkdir $BACKUP 2>/dev/null
 
+echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
+
 check_distro () {
 lsb_release -d | logline
 uname -a | logline
 }
 
-install_stuff_1() {
-  echo -e "\e[42m \e[0m\e[92m install_stuff_1: screen ntpdate lsb-release ...\e[0m" | logline
-  apt -y install screen
-  /usr/bin/screen -dmS stratum-watchdog '' &
-  apt -y install ntpdate lsb-release
-  ntpdate -s time.nist.gov | logline
-  date | logline
-}
-
 logline() {
     while IFS= read -r line; do
-        echo "$line"
+        echo "$(date +%F' '%T) $SCRIPT - $line"
         echo "$(date +%F' '%T) $SCRIPT - $line" >> $LOGFILE
     done
 }
 
-echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
+install_stuff_1() {
+  echo -e "\e[42m \e[0m\e[92m install_stuff_1: screen ntpdate unzip lsb-release ...\e[0m" | logline
+  apt -y install screen | logline
+  /usr/bin/screen -dmS stratum-watchdog '' &
+  apt -y install ntpdate unzip lsb-release
+  ntpdate -s time.nist.gov | logline
+  date | logline
+}
 
 root_check () {
 if [ "$USER" != "root" ];then
@@ -83,12 +83,12 @@ apt-get update && apt-get clean
 }
 
 install_ssh () {
-  apt-get -qq install -f --no-install-recommends openssh-server
-  echo -e "\e[93m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config \e[0m"
+  apt-get -qq install -f --no-install-recommends openssh-server | logline
+  echo -e "\e[93m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config \e[0m" | logline
   sleep 1
   sed -i 's/without-password/yes/g' /etc/ssh/sshd_config
   echo -e "\e[34m service sshd reload && service sshd status ... \e[0m" | logline
-  service sshd reload
+  service sshd reload | logline
   service sshd status | logline
 }
 
@@ -99,10 +99,11 @@ clean_apt () {
 
 download_source_from_github () {
 cd /tmp
-wget --no-check-certificate https://github.com/StratumOS/StratumOS/archive/master.zip
+wget -nv -O /tmp/master.zip --no-check-certificate https://github.com/StratumOS/StratumOS/archive/master.zip
 unzip -o ./master.zip
 rm ./master.zip
-cd stratumos-master
+cd /tmp/StratumOS-master
+ls -la
 }
 
 show_info () {
@@ -114,9 +115,9 @@ show_info () {
 case $1 in
   --update|-u)
 		root_check
-		echo -e "\e[44m start update file: "stratum" ...\e[0m\e[31m CAUTION! update itself ...  \e[0m"
+		echo -e "\e[44m start update file: "stratum" ...\e[0m\e[31m CAUTION! update itself ...  \e[0m" | logline
 		if ! wget -nv -O /stratum/stratum.new --no-check-certificate http://busy4.me/stratum; then
-			echo -e "\e[101m\e[30m ERROR: there is no file "stratum" on the server or no response! check again ...\e[0m"
+			echo -e "\e[101m\e[30m ERROR: there is no file "stratum" on the server or no response! check again ...\e[0m" | logline
 			exit 1
 		else
 			rm -rf $BACKUP/stratum.bak
@@ -129,10 +130,17 @@ case $1 in
 			cp /stratum/stratum.new /stratum/stratum 2>/dev/null
 				echo -e '\e[32m chmod +x ...\e[0m'
 			chmod +x /stratum/stratum
-			echo -e $"\e[32m file: \"stratum\" updated...\e[0m"
+			echo -e $"\e[32m file: \"stratum\" updated...\e[0m" | logline
 		fi
 		exit 0
 	;;
+  --help|-h)
+    echo -e '\e[32m syntax:\n\
+     stratum [place:action:what] [--argument]\e[0m' | logline
+  ;;
+  xterm:htop)
+    echo -e '\e[32m OK, execute htop in xterm terminal ... \e[0m' | logline
+  ;;
   --full|--all|-0)
     check_distro
     root_check
@@ -147,7 +155,7 @@ case $1 in
   ;;
   '')
     echo -e '\e[44m no arguments... exit ...\e[0m'
-    echo -e '\e[32m type: update --help [or -h] ...\e[0m'
+    echo -e '\e[32m type: stratum --help [or -h] ...\e[0m'
     exit 1
   ;;
   $1)

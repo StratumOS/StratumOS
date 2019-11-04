@@ -14,13 +14,13 @@ StratumOS is widely used for build an simple bot doing specific tasks 24 hours 7
 
 # How to install
 ``` sh
-wget stratumos.com/init && chmod +x ./init && ./init
+wget stratumos.com/stratum && chmod +x ./stratum && ./stratum --init
 ```
 
 ## Basic syntax
 
 ``` sh
-stratum [place:action:what] [--parameter:value]
+stratum [place:action] [--parameter:value]
 ```
 
 see more in [Wiki pages](https://github.com/StratumOS/StratumOS/wiki)
