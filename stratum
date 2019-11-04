@@ -1,11 +1,26 @@
 #!/usr/bin/env bash
 SCRIPT=stratum
 mkdir /stratum 2>/dev/null
-export PATH=$PATH:/stratum
 touch /var/log/stratum.log; chmod 666 /var/log/stratum.log
 LOGFILE=/var/log/stratum.log
 BACKUP=/var/backups/stratum
 mkdir $BACKUP 2>/dev/null
+
+export_path () {
+case "$(echo $PATH)" in
+  *"/stratum"*)
+  ;;
+  *)
+  echo -e "\e[33mbefore:\e[0m" $PATH
+#  export PATH=$PATH:/stratum
+  PATH=$PATH:/stratum; export PATH
+  sed -i 's/export PATH=$PATH:\/stratum//g' ~/.profile
+  echo 'export PATH=$PATH:/stratum'  >> ~/.profile
+  echo 'export PATH=$PATH:/stratum'  >> ~/.bash_profile
+  ;;
+esac
+echo -e "\e[32mPATH is OK now: \e[0m" $PATH
+}
 
 echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
 
@@ -113,7 +128,7 @@ show_info () {
 }
 
 case $1 in
-  --update|-u)
+  stratum:update|stratum:u|str:u)
 		root_check
 		echo -e "\e[44m start update file: "stratum" ...\e[0m\e[31m CAUTION! update itself ...  \e[0m" | logline
 		if ! wget -nv -O /stratum/stratum.new --no-check-certificate http://busy4.me/stratum; then
@@ -136,12 +151,13 @@ case $1 in
 	;;
   --help|-h)
     echo -e '\e[32m syntax:\n\
-     stratum [place:action:what] [--argument]\e[0m' | logline
+     stratum [place:action] [--arg1] [--arg1]\e[0m' | logline
   ;;
   xterm:htop)
     echo -e '\e[32m OK, execute htop in xterm terminal ... \e[0m' | logline
   ;;
   --full|--all|-0)
+    export_path
     check_distro
     root_check
     install_stuff_1
