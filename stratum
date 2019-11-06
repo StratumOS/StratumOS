@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 SCRIPT=stratum
 mkdir /stratum 2>/dev/null
+mkdir $HOME/.stratum 2>/dev/null
 touch /var/log/stratum.log; chmod 666 /var/log/stratum.log
 LOGFILE=/var/log/stratum.log
 BACKUP=/var/backups/stratum
