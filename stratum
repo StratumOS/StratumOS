@@ -5,7 +5,10 @@ mkdir $HOME/.stratum 2>/dev/null
 touch /var/log/stratum.log; chmod 666 /var/log/stratum.log
 LOGFILE=/var/log/stratum.log
 BACKUP=/var/backups/stratum
+REPO_URL=http://stratumos.com
 mkdir $BACKUP 2>/dev/null
+echo -e "\e[32m REPO_URL=\e[0m"$REPO_URL
+echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
 
 export_path () {
 case "$(echo $PATH)" in
@@ -22,8 +25,6 @@ case "$(echo $PATH)" in
 esac
 echo -e "\e[32mPATH is OK now: \e[0m" $PATH
 }
-
-echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
 
 check_distro () {
 lsb_release -d | logline
@@ -129,12 +130,10 @@ show_info () {
 }
 
 case $1 in
-  init)
-  ;;
-  stratum:update|stratum:u|str:u)
+  --update|stratum:update|stratum:u|str:u)
 		root_check
 		echo -e "\e[44m start update file: "stratum" ...\e[0m\e[31m CAUTION! update itself ...  \e[0m" | logline
-		if ! wget -nv -O /stratum/stratum.new --no-check-certificate http://busy4.me/stratum; then
+		if ! wget -nv -O /stratum/stratum.new --no-check-certificate $REPO_URL/stratum; then
 			echo -e "\e[101m\e[30m ERROR: there is no file "stratum" on the server or no response! check again ...\e[0m" | logline
 			exit 1
 		else
@@ -159,7 +158,7 @@ case $1 in
   xterm:htop)
     echo -e '\e[32m OK, execute htop in xterm terminal ... \e[0m' | logline
   ;;
-  --full|--all|-0)
+  --full|--all|-0|--init|init)
     export_path
     check_distro
     root_check
@@ -173,8 +172,7 @@ case $1 in
     show_info
   ;;
   '')
-    echo -e '\e[44m no arguments... exit ...\e[0m'
-    echo -e '\e[32m type: stratum --help [or -h] ...\e[0m'
+    echo -e '\e[44m no arguments... exit ...\e[0m \e[32m type: stratum --help [or -h] ...\e[0m'
     exit 1
   ;;
   $1)
