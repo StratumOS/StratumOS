@@ -129,6 +129,8 @@ show_info () {
 }
 
 case $1 in
+  init)
+  ;;
   stratum:update|stratum:u|str:u)
 		root_check
 		echo -e "\e[44m start update file: "stratum" ...\e[0m\e[31m CAUTION! update itself ...  \e[0m" | logline
