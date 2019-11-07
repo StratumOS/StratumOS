@@ -60,7 +60,6 @@ logline() {
     done
 }
 
-
 root_check () {
 if [ "$USER" != "root" ];then
 		echo -e "\e[31mRun this script as root! exit...\e[0m"
@@ -75,10 +74,14 @@ LOGFILE=/var/log/stratum.log
 BACKUP=/var/backups/stratum
 mkdir $BACKUP 2>/dev/null
 
+info_bar () {
 echo -e "\e[42m\e[30mOK\e[0m\e[33m\e[32m SCRIPT=\e[0m\e[94m"$SCRIPT \
 "\e[0m\e[33m\e[32m ARGS=\e[0m\e[94m"$ARGS \
-"\e[0m\e[32m REPO_URL=\e[0m"$REPO_URL "\e[32m LOGFILE=\e[0m"$LOGFILE
+"\e[0m\e[33m\e[32m USER=\e[0m\e[93m"$USER \
+"\e[0m\e[32m URL_01=\e[0m"$URL_01 "\e[32m LOGFILE=\e[0m"$LOGFILE
 echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
+}
+info_bar
 
 export_path () {
 case "$(echo $PATH)" in
