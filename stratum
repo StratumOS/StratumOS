@@ -11,6 +11,7 @@ CONF=.stratum.conf # config file
 FUNC=.stratum.func # bash functions file
 STRATUM_DIR=/stratum
 source ./$CONF
+source ./$FUNC
 
 init () {
 rm $STRATUM_DIR/$CONF; rm $STRATUM_DIR/$FUNC; echo "remove config & functions files and download again ..."
@@ -110,6 +111,45 @@ check_distro () {
 lsb_release -d | logline
 uname -a | logline
 }
+
+while getopts ":s m: :c x: r: :h" option
+	do
+		case "${option}" in
+		s)
+			memcheck
+			swap_clean
+			memcheck
+		;;
+		m)
+			mem=${OPTARG}
+			memcheck
+		;;
+		c)
+			memcheck
+			clearcache
+			memcheck
+		;;
+		x)
+			CONSOLE=${OPTARG}
+			restartx
+		;;
+		r)
+			DSP=${OPTARG}
+			restart
+		;;
+		h)
+			help
+		;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+		;;
+		:)
+			echo "Option -$OPTARG requires an argument." >&2
+			exit 1
+		;;
+	esac
+done
+
 case $1 in
   --init|-i)
     init

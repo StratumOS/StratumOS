@@ -107,6 +107,19 @@ help (){
   echo
   echo -e '\e[32m syntax:\n\
   stratum [place:action] [--arg1] [--arg1]\e[0m' | logline
+  echo -e "\e[44mUsage:\n\
+stratum [-e|-m|-c|-x|-r] place [-h]\n\
+places: ttyX or DISPLAY number eg. :0\n\
+-s #clean swap memory \n\
+-m usage #print memory usage in MB\n\
+-m percent #print memory usage in percents \n\
+-m print #print memory details \n\
+-c #clearcache\n\
+-x TTY #Restart X server in TTY console, eg. -x tty1\n\
+-r DISPLAY #Restart all windows in DISPLAY eg. -r 0\n\
+-h #Help\n\
+\e[0m"
+
 }
 
 init_old () {
@@ -134,4 +147,77 @@ rm $HOME/.bashrc
 echo -e "\e[32m Download bash preferences files ... \n\ wget -nv --no-check-certificate http://stratumos.com/node \e[0m"
 	wget -nv -O /root/.bash_aliases --no-check-certificate $REPO_URL/node/.bashrc
 	wget -nv -O /home/busyman/.bash_aliases --no-check-certificate $REPO_URL/node/.bash_aliases
+}
+
+swap_clean() {
+swapoff -a && swapon -a
+}
+
+memcheck() {
+	memory_total=$(free -m | awk 'NR==2{printf "%s\n", $2 }')
+	memory_summary=$(free -m | awk 'NR==2{printf "Memory Usage: %s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
+	memory_usage=$(free -m | awk 'NR==2{printf "%s\n", $3,$2,$3*100/$2 }')
+	memory_usage_percent=$(free -m | awk 'NR==2{printf "%s %.2f%%\n", $3,$2,$3*100/$2 }')
+case $mem in
+	usage)
+		limit=90
+		if (( $memory_usage * 100 / $memory_total < $limit )); then
+			echo $memory_usage 'is lower than '$limit '%'
+		else
+			echo $memory_usage 'memory usage is higher than' $limit '%!... oh oh ...'
+		fi
+		exit
+	;;
+	percent)
+		percent=$(($memory_usage * 100 / $memory_total))
+		echo $percent
+		exit
+	;;
+	print)
+		echo '' $memory_summary
+		echo -e 'Used: \e[32m' $memory_usage '\e[0m'
+		echo -e 'Command: \e[33m' free -h '\e[0m'
+		free -h
+		echo -e 'Command: \e[33m' df -h '\e[0m'
+		df -h
+		echo -e 'Command: \e[33m' du \/ -h --max-depth=1 '\e[0m'
+		du / -h --max-depth=1
+	;;
+	*)
+		help
+	;;
+esac
+}
+
+clearcache() {
+echo -e "\e[44m Clear cache ...                                \e[0m" >&2
+cat /proc/sys/vm/drop_caches
+echo -e '\e[93m'
+sync && echo 3 > /proc/sys/vm/drop_caches
+echo -e '\e[0m'
+cat /proc/sys/vm/drop_caches
+}
+
+# restart X server in ttyX
+restartx() {
+echo -e "\e[31m Soft restart X server in: $CONSOLE \e[0m" >&2
+echo -e "\$CONSOLE: $CONSOLE"
+(sleep 10 && systemctl restart getty@$CONSOLE) & systemctl restart getty@$CONSOLE
+}
+
+# soft restart, close all windows and scripts in DISPLAY:X
+restart() {
+DISPLAY=$DSP
+zenity --info --title="Close" --text="Close all windows and start again ..." --timeout 3
+echo -e "\e[41m   \e[0m\e[31m close all windows in:\e[33m DISPLAY=\e[0m$DISPLAY"
+#export DISPLAY=$DSP && xdotool search --onlyvisible "" windowkill %@
+export DISPLAY=$DSP && xdotool key --delay 500 Ctrl+w Ctrl+w Ctrl+w
+export DISPLAY=$DSP && xdotool key --delay 500 Alt+F4 Alt+F4 Alt+F4
+export DISPLAY=$DSP && xdotool search --onlyvisible "chrome" windowkill
+export DISPLAY=$DSP && xdotool search --onlyvisible "chrome" windowkill
+FRAME=$(echo "frame"$DISPLAY | tr -d \:)
+echo -e "\e[43m   \e[0m\e[33m stop:\e[33m FRAME=\e[0m$FRAME"
+pkill $FRAME
+echo -e "\e[42m   \e[0m\e[32m start:\e[33m FRAME=\e[0m$FRAME"
+export DISPLAY=$DSP && /opt/busy4me/$FRAME
 }
