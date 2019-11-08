@@ -64,22 +64,13 @@ update () {
 
 logline() {
     while IFS= read -r line; do
-      case $line in
-        *"denied"*)
-          echo -e "\e[30m ! \e[0m\e[33m -LIGHT_WARNING"
-          ;;
-          *)
-          ;;
-      esac
-        echo -e "$(date +%F' '%T) $SCRIPT - $line"
-        echo "$(date +%F' '%T) $SCRIPT - $line" >> $LOGFILE
+        echo -e "$(date +%F' '%T) $SCRIPT - $line"; echo "$(date +%F' '%T) $SCRIPT - $line" >> $LOGFILE
     done
 }
 
 root_check () {
 if [ "$USER" != "root" ];then
-		echo -e "\e[31mRun this script as root! exit...\e[0m"
-		echo "Run this script as root! exit..." | logline; exit
+		echo -e "\e[31mRun this script as root! exit...\e[0m" | logline; exit
 	else
 		echo -e "\e[32mStart OK ... as root\e[0m" | logline
 fi
@@ -95,7 +86,7 @@ echo -e "\e[42m\e[30mOK\e[0m\e[33m\e[32m SCRIPT=\e[0m\e[94m"$SCRIPT \
 "\e[0m\e[33m\e[32m ARGS=\e[0m\e[94m"$ARGS \
 "\e[0m\e[33m\e[32m USER=\e[0m\e[93m"$USER \
 "\e[0m\e[32m REPO_URL=\e[0m"$REPO_URL "\e[32m LOGFILE=\e[0m"$LOGFILE
-echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" >> $LOGFILE
+echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" 2>/dev/null >> $LOGFILE
 }
 info_bar
 
