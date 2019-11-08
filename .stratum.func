@@ -1,2 +1,137 @@
 #!/usr/bin/env bash
 # .stratum.conf - StratumOS functions
+
+install_stuff_1() {
+  echo -e "\e[42m \e[0m\e[92m install_stuff_1: screen ntpdate unzip lsb-release ...\e[0m" | logline
+  apt -y install screen | logline
+  screen -S stratum-watchdog -X kill
+  /usr/bin/screen -dmS stratum-watchdog '' &
+  apt -y install ntpdate unzip lsb-release
+  date
+  echo "ntpdate in screen ... "; /usr/bin/screen -dmS stratum-watchdog 'ntpdate -s time.nist.gov' &
+  echo "mc in screen ... "; /usr/bin/screen -dmS mc 'mc' &
+  date | logline
+}
+
+install_stuff_2() {
+  echo "install stuff 2"
+}
+
+create_busyuser () {
+busyuser=busyman
+groupadd $busyuser
+useradd $busyuser -s /bin/bash -m -g $busyuser
+# allow execute crontab for busyuser
+cat > /etc/cron.allow << EOF
+$busyuser
+EOF
+EOF 2>/dev/null # without this line code colors in Atom editor are crazy
+
+echo -e "\e[104m \e[0m\e[94m user busyman created ...\e[0m" | logline
+cat /etc/cron.allow
+}
+
+rm_files () {
+  if [ -z $./var/backups/dpkg*.gz ];then
+  	rm /var/backups/dpkg*.gz
+  fi
+  if [ -z $./var/cache/apt/*.bin ];then
+  	rm /var/cache/apt/*.bin
+  fi
+  if [ -z $./var/cache/debconf/* ];then
+  	rm /var/cache/debconf/*
+  fi
+  if [ -z $./var/cache/apt/archives/*.deb ];then
+  	rm /var/cache/apt/archives/*.deb
+  fi
+  if [ -z $./var/lib/apt/lists/*.* ];then
+  	rm /var/lib/apt/lists/*.*
+  fi
+  if [ -z $./etc/apt/apt.conf ];then
+  	rm /etc/apt/apt.conf
+  fi
+}
+
+apt_files () {
+echo -e "\e[35m create /etc/apt/apt.conf and add Debian Jessie main repo ... \e[0m"
+echo 'APT::Install-Recommends "false" ; APT::Install-Suggests "false" ;' >> /etc/apt/apt.conf
+rm /etc/apt/sources.list
+echo 'deb http://ftp.debian.org/debian jessie main' >> /etc/apt/sources.list
+apt-get update && apt-get clean
+}
+
+install_ssh () {
+  apt-get -qq install -f --no-install-recommends openssh-server | logline
+  echo -e "\e[93m #allow root ssh login,, sed -i 's/without-password/yes/g' /etc/ssh/sshd_config \e[0m" | logline
+  sleep 1
+  sed -i 's/without-password/yes/g' /etc/ssh/sshd_config
+  echo -e "\e[34m service sshd reload && service sshd status ... \e[0m" | logline
+  service sshd reload | logline
+  service sshd status | logline
+}
+
+clean_apt () {
+  echo -e "\e[35m apt-get --purge autoremove && apt-get clean..................\e[0m" | logline
+  apt-get -qq --purge autoremove && apt-get clean
+}
+
+download_source_from_github () {
+cd /tmp
+wget -nv -O /tmp/master.zip --no-check-certificate https://github.com/StratumOS/StratumOS/archive/master.zip
+unzip -o ./master.zip
+rm ./master.zip
+cd /tmp/StratumOS-master
+ls -la
+}
+
+show_info () {
+  echo -e "\e[42m \e[30m  |-->\e[0m\e[32m Show info ... "
+  ip addr
+  tput setaf 3; echo -e "Done ... \e[0m"
+}
+
+help (){
+  echo
+  echo "# arguments called with ---->  ${@}     "
+  echo "# \$1 ---------------------->  $1       "
+  echo "# \$2 ---------------------->  $2       "
+  echo "# path to me --------------->  ${0}     "
+  echo "# parent path -------------->  ${0%/*}  "
+  echo "# my name ------------------>  ${0##*/} "
+  echo
+  echo -e "\e[107m\e[30m ALERTS: \e[0m \e[42m\e[30m OK \e[0m\e[32m -SUCESS, \e[44m\e[37m I \e[0m\e[94m -INFO, \
+  \e[100m\e[97m I \e[0m\e[97m -LIGHT_INFO, \e[100m\e[37m I \e[0m\e[90m -DARK_INFO, \
+  \e[45m\e[30m ? \e[0m\e[95m -QUESTION, \e[43m\e[30m ! \e[0m\e[33m -WARNING, \
+  \e[105m\e[30m ? \e[0m\e[95m -LIGHT_QUESTION, \e[103m\e[30m ! \e[0m\e[33m -LIGHT_WARNING, \
+  \e[101m\e[30m ! \e[0m\e[91m -DANGER, \e[41m\e[37m<\e[30m!!\e[37m>\e[0m\e[31m -CRITICAL, "
+  echo
+  echo -e '\e[32m syntax:\n\
+  stratum [place:action] [--arg1] [--arg1]\e[0m' | logline
+}
+
+init_old () {
+  if [[ -s ./$CONF && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; then
+    source ./$CONF
+    echo -e "\e[42m\e[30m OK \e[0m\e[32m ready to install!\e[0m"
+  else
+    mkdir $HOME/.stratum 2>/dev/null
+    mkdir /stratum 2>/dev/null
+    if ! wget -nv -O ./$CONF --no-check-certificate $URL_01/$CONF; then
+      echo -e "\e[101m\e[30m ERROR: there is no file \e[0m\e[34m"$CONF"\e[0m on the server or no response! exit ...\e[0m"
+      exit 1
+    else
+      echo -e "OK: download file "$CONF" from "$URL_01
+    fi
+    exit
+  fi
+}
+
+update_preferences () {
+cp $HOME/.bash_aliases $HOME/.bash_aliases.bak
+cp $HOME/.bashrc $HOME/.bashrc.bak
+rm $HOME/.bash_aliases
+rm $HOME/.bashrc
+echo -e "\e[32m Download bash preferences files ... \n\ wget -nv --no-check-certificate http://stratumos.com/node \e[0m"
+	wget -nv -O /root/.bash_aliases --no-check-certificate $REPO_URL/node/.bashrc
+	wget -nv -O /home/busyman/.bash_aliases --no-check-certificate $REPO_URL/node/.bash_aliases
+}
