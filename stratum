@@ -139,4 +139,7 @@ case $1 in
   $1)
     $1
   ;;
+  --help)
+    help
+  ;;
 esac
