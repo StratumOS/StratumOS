@@ -24,9 +24,9 @@ while ! [[ -s $HOME/$CONF && -s $HOME/$FUNC && -d $HOME/.stratum && -d /stratum 
   if ! [[ $SCRIPT_PATH == "/stratum" ]] && [[ -L ./stratum ]] && [[ -d ./stratum ]]; then
     rm ./stratum
     echo -e "\e[101m\e[30m ! \e[0m\e[31m remove 'stratum' from current path\e[0m"
-  else
-    echo -e "\e[104m\e[30m - \e[0m\e[34m i'm not in /stratum path &\
-    ./stratum is not a directory or symlink ... OK \e[0m"
+#  else
+#    echo -e "\e[104m\e[30m - \e[0m\e[34m i'm not in /stratum path &\
+#    ./stratum is not a directory or symlink ... OK \e[0m"
   fi
   ln -s $STRATUM_DIR/stratum $HOME/stratum 2>/dev/null # symlink link
   ln -s $STRATUM_DIR/.stratum.conf $HOME/$CONF 2>/dev/null # symlink link
@@ -61,6 +61,7 @@ update () {
     cp /stratum/stratum $BACKUP/stratum.bak
       echo -e '\e[35m backup file: '$BACKUP'/'$SCRIPT.bak' ...just in case...\e[0m'
       echo -e '\e[32m remove existing oryginal ...\e[0m'
+    ln -s $BACKUP/$SCRIPT.bak /stratum/$SCRIPT.bak 2>/dev/null # symlink link
     rm -rf /stratum/stratum
       echo -e '\e[32m copy new one...\e[0m'
     chmod +x /stratum/stratum.new
@@ -121,94 +122,80 @@ lsb_release -d | logline
 uname -a | logline
 }
 
-while getopts ":elp :a b: :s m: :c x: r: :h" option
-	do
-		case "${option}" in
-		a)
-    echo "option a with no arguments"
+for i in "$@"; do
+case $i in
+    -u|--update)
+  		shift
+      root_check
+      update
+  	;;
+    --i|-init)
+      shift
+      info_bar
+      init
     ;;
-    -help)
-    echo "option help"
-    info_bar
-    help
+    -u=*|--update=*)
+      file_update="${i#*=}"
+      echo -e "\e[44m update specific file: \e[0m file_update="$file_update
+      shift # past argument=value
     ;;
-    b)
-    b_arg=${OPTARG}
-    echo "option b with argument b_arg="$b_arg
+    -m=*|--mem=*)
+      mem="${i#*=}"
+      echo "mem="$mem
+      shift # past argument=value
+      memcheck
     ;;
-    b)
-    b_arg=${OPTARG}
-    echo "option b with argument b_arg="$b_arg
-    ;;
-    s)
+    -s|--swapclean)
       mem=usage
       echo -e "\e[31m before: \e[0m"; memcheck
 			swap_clean
       echo -e "\e[32m after: \e[0m"; memcheck
 		;;
-		m)
-			mem=${OPTARG}
-			memcheck
-		;;
-		c)
+    -c|--clearcache)
       mem=usage
-			echo -e "\e[31m before: \e[0m"; memcheck
-			clearcache
-			echo -e "\e[32m after: \e[0m"; memcheck
-		;;
-		x)
-			CONSOLE=${OPTARG}
-			restartx
-		;;
-		r)
-			DSP=${OPTARG}
+      shift # past argument=value
+      echo -e "\e[31m before: \e[0m"; memcheck
+      clearcache
+      echo -e "\e[32m after: \e[0m"; memcheck
+    ;;
+    -r=*|--restart=*)
+			DSP="${i#*=}"
+      echo "DSP="$DSP
+      shift # past argument=value
 			restart
 		;;
-    h)
-    info_bar
-		  help
-    ;;
-		\?)
-			echo "Invalid option: -$OPTARG" >&2
+    -x=*|--xrestart=*)
+			CONSOLE="${i#*=}"
+      echo "CONSOLE="$CONSOLE
+      shift # past argument=value
+			xrestart
 		;;
-		:)
-			echo "Option -$OPTARG requires an argument." >&2
-			exit 1
-		;;
-	esac
-done
-
-case $1 in
-  --init|-i)
-  info_bar
-    init
+    --full|--all|-0)
+      info_bar
+      export_path
+      check_distro
+      root_check
+      install_stuff_1
+      create_busyuser
+      rm_files
+      apt_files
+      install_ssh
+      clean_apt
+      download_source_from_github
+      show_info
     ;;
-  --update|stratum:update|stratum:u|str:u)
-		root_check
-    update
-	;;
-  xterm:htop)
-    echo -e '\e[32m OK, execute htop in xterm terminal ... \e[0m' | logline
-  ;;
-  --full|--all|-0)
-    info_bar
-    export_path
-    check_distro
-    root_check
-    install_stuff_1
-    create_busyuser
-    rm_files
-    apt_files
-    install_ssh
-    clean_apt
-    download_source_from_github
-    show_info
-  ;;
-  '')
-    echo -e '\e[44m no arguments... exit ...\e[0m \e[32m type: stratum --help [or -h] ...\e[0m'
-    exit 1
-  ;;
-  $1)
-    $1
-  ;;
+    -h|--help)
+      echo "option help"
+      shift # past argument=value
+      info_bar
+      help
+    ;;
+    '')
+      echo -e '\e[44m no arguments... exit ...\e[0m \e[32m type: stratum --help [or -h] ...\e[0m'
+      exit 1
+    ;;
+    *)
+      echo "unknown option ... "
+    ;;
 esac
+done

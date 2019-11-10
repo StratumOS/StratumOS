@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # .stratum.conf - StratumOS functions
 
-help (){
+help () {
   echo -e "\e[107m\e[30m ALERTS: \e[0m \e[42m\e[30m OK \e[0m\e[32m -SUCESS, \e[44m\e[37m I \e[0m\e[94m -INFO, \
   \e[100m\e[97m I \e[0m\e[97m -LIGHT_INFO, \e[100m\e[37m I \e[0m\e[90m -DARK_INFO, \
   \e[45m\e[30m ? \e[0m\e[95m -QUESTION, \e[43m\e[30m ! \e[0m\e[33m -WARNING, \
@@ -22,7 +22,7 @@ places: ttyX or DISPLAY number eg. :0\n\
 \e[0m"
 }
 
-install_stuff_1() {
+install_stuff_1 () {
   echo -e "\e[42m \e[0m\e[92m install_stuff_1: screen ntpdate unzip lsb-release ...\e[0m" | logline
   apt -y install screen | logline
   screen -S stratum-watchdog -X kill
@@ -34,7 +34,7 @@ install_stuff_1() {
   date | logline
 }
 
-install_stuff_2() {
+install_stuff_2 () {
   echo "install stuff 2"
 }
 
@@ -121,11 +121,11 @@ echo -e "\e[32m Download bash preferences files ... \n\ wget -nv --no-check-cert
 	wget -nv -O /home/busyman/.bash_aliases --no-check-certificate $REPO_URL/node/.bash_aliases
 }
 
-swap_clean() {
+swap_clean () {
 swapoff -a && swapon -a
 }
 
-memcheck() {
+memcheck () {
 	memory_total=$(free -m | awk 'NR==2{printf "%s\n", $2 }')
 	memory_summary=$(free -m | awk 'NR==2{printf "Memory Usage: %s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
 	memory_usage=$(free -m | awk 'NR==2{printf "%s\n", $3,$2,$3*100/$2 }')
@@ -159,7 +159,7 @@ case $mem in
 esac
 }
 
-clearcache() {
+clearcache () {
 echo -e "\e[44m Clear cache ...   \e[0m" >&2
 cat /proc/sys/vm/drop_caches
 #echo -e '\e[93m'
@@ -169,14 +169,14 @@ cat /proc/sys/vm/drop_caches
 }
 
 # restart X server in ttyX
-restartx() {
+xrestart () {
 echo -e "\e[31m Soft restart X server in: $CONSOLE \e[0m" >&2
 echo -e "\$CONSOLE: $CONSOLE"
 (sleep 10 && systemctl restart getty@$CONSOLE) & systemctl restart getty@$CONSOLE
 }
 
 # soft restart, close all windows and scripts in DISPLAY:X
-restart() {
+restart () {
 DISPLAY=$DSP
 zenity --info --title="Close" --text="Close all windows and start again ..." --timeout 3
 echo -e "\e[41m   \e[0m\e[31m close all windows in:\e[33m DISPLAY=\e[0m$DISPLAY"
