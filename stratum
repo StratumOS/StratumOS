@@ -89,7 +89,6 @@ echo -e "\e[42m\e[30mOK\e[0m\e[33m\e[32m SCRIPT=\e[0m\e[94m"$SCRIPT \
 "\e[0m\e[32m REPO_URL=\e[0m"$REPO_URL "\e[32m LOGFILE=\e[0m"$LOGFILE
 echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" 2>/dev/null >> $LOGFILE
 }
-info_bar
 
 export_path () {
 case "$(echo $PATH)" in
@@ -112,22 +111,40 @@ lsb_release -d | logline
 uname -a | logline
 }
 
-while getopts ":s m: :c x: r: :h" option
+while getopts ":elp :a b: :s m: :c x: r: :h" option
 	do
 		case "${option}" in
-		s)
-			memcheck
+		a)
+    echo "option a with no arguments"
+    ;;
+    -help)
+    echo "option help"
+    info_bar
+    help
+    ;;
+    b)
+    b_arg=${OPTARG}
+    echo "option b with argument b_arg="$b_arg
+    ;;
+    b)
+    b_arg=${OPTARG}
+    echo "option b with argument b_arg="$b_arg
+    ;;
+    s)
+      mem=usage
+      echo -e "\e[31m before: \e[0m"; memcheck
 			swap_clean
-			memcheck
+      echo -e "\e[32m after: \e[0m"; memcheck
 		;;
 		m)
 			mem=${OPTARG}
 			memcheck
 		;;
 		c)
-			memcheck
+      mem=usage
+			echo -e "\e[31m before: \e[0m"; memcheck
 			clearcache
-			memcheck
+			echo -e "\e[32m after: \e[0m"; memcheck
 		;;
 		x)
 			CONSOLE=${OPTARG}
@@ -137,9 +154,10 @@ while getopts ":s m: :c x: r: :h" option
 			DSP=${OPTARG}
 			restart
 		;;
-		h)
-			help
-		;;
+    h)
+    info_bar
+		  help
+    ;;
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
 		;;
@@ -152,19 +170,18 @@ done
 
 case $1 in
   --init|-i)
+  info_bar
     init
     ;;
   --update|stratum:update|stratum:u|str:u)
 		root_check
     update
 	;;
-  --help|-h)
-    help
-    ;;
   xterm:htop)
     echo -e '\e[32m OK, execute htop in xterm terminal ... \e[0m' | logline
   ;;
   --full|--all|-0)
+    info_bar
     export_path
     check_distro
     root_check
@@ -183,8 +200,5 @@ case $1 in
   ;;
   $1)
     $1
-  ;;
-  --help)
-    help
   ;;
 esac

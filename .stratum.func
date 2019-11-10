@@ -1,6 +1,27 @@
 #!/usr/bin/env bash
 # .stratum.conf - StratumOS functions
 
+help (){
+  echo -e "\e[107m\e[30m ALERTS: \e[0m \e[42m\e[30m OK \e[0m\e[32m -SUCESS, \e[44m\e[37m I \e[0m\e[94m -INFO, \
+  \e[100m\e[97m I \e[0m\e[97m -LIGHT_INFO, \e[100m\e[37m I \e[0m\e[90m -DARK_INFO, \
+  \e[45m\e[30m ? \e[0m\e[95m -QUESTION, \e[43m\e[30m ! \e[0m\e[33m -WARNING, \
+  \e[105m\e[30m ? \e[0m\e[95m -LIGHT_QUESTION, \e[103m\e[30m ! \e[0m\e[33m -LIGHT_WARNING, \
+  \e[101m\e[30m ! \e[0m\e[91m -DANGER, \e[41m\e[37m<\e[30m!!\e[37m>\e[0m\e[31m -CRITICAL, \e[0m"
+  echo -e '\e[32m syntax: stratum [place:action] [--option1] [--option2]\e[0m' | logline
+  echo -e "\e[44mUsage:\n\
+stratum [-e|-m|-c|-x|-r] place [-h]\n\
+places: ttyX or DISPLAY number eg. :0\n\
+-s #clean swap memory \n\
+-m usage #print memory usage in MB\n\
+-m percent #print memory usage in percents \n\
+-m print #print memory details \n\
+-c #clearcache\n\
+-x TTY #Restart X server in TTY console, eg. -x tty1\n\
+-r DISPLAY #Restart all windows in DISPLAY eg. -r 0\n\
+-h #Help\n\
+\e[0m"
+}
+
 install_stuff_1() {
   echo -e "\e[42m \e[0m\e[92m install_stuff_1: screen ntpdate unzip lsb-release ...\e[0m" | logline
   apt -y install screen | logline
@@ -90,38 +111,6 @@ show_info () {
   tput setaf 3; echo -e "Done ... \e[0m"
 }
 
-help (){
-  echo
-  echo "# arguments called with ---->  ${@}     "
-  echo "# \$1 ---------------------->  $1       "
-  echo "# \$2 ---------------------->  $2       "
-  echo "# path to me --------------->  ${0}     "
-  echo "# parent path -------------->  ${0%/*}  "
-  echo "# my name ------------------>  ${0##*/} "
-  echo
-  echo -e "\e[107m\e[30m ALERTS: \e[0m \e[42m\e[30m OK \e[0m\e[32m -SUCESS, \e[44m\e[37m I \e[0m\e[94m -INFO, \
-  \e[100m\e[97m I \e[0m\e[97m -LIGHT_INFO, \e[100m\e[37m I \e[0m\e[90m -DARK_INFO, \
-  \e[45m\e[30m ? \e[0m\e[95m -QUESTION, \e[43m\e[30m ! \e[0m\e[33m -WARNING, \
-  \e[105m\e[30m ? \e[0m\e[95m -LIGHT_QUESTION, \e[103m\e[30m ! \e[0m\e[33m -LIGHT_WARNING, \
-  \e[101m\e[30m ! \e[0m\e[91m -DANGER, \e[41m\e[37m<\e[30m!!\e[37m>\e[0m\e[31m -CRITICAL, "
-  echo
-  echo -e '\e[32m syntax:\n\
-  stratum [place:action] [--arg1] [--arg1]\e[0m' | logline
-  echo -e "\e[44mUsage:\n\
-stratum [-e|-m|-c|-x|-r] place [-h]\n\
-places: ttyX or DISPLAY number eg. :0\n\
--s #clean swap memory \n\
--m usage #print memory usage in MB\n\
--m percent #print memory usage in percents \n\
--m print #print memory details \n\
--c #clearcache\n\
--x TTY #Restart X server in TTY console, eg. -x tty1\n\
--r DISPLAY #Restart all windows in DISPLAY eg. -r 0\n\
--h #Help\n\
-\e[0m"
-
-}
-
 init_old () {
   if [[ -s ./$CONF && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; then
     source ./$CONF
@@ -166,12 +155,10 @@ case $mem in
 		else
 			echo $memory_usage 'memory usage is higher than' $limit '%!... oh oh ...'
 		fi
-		exit
 	;;
 	percent)
 		percent=$(($memory_usage * 100 / $memory_total))
 		echo $percent
-		exit
 	;;
 	print)
 		echo '' $memory_summary
@@ -190,11 +177,11 @@ esac
 }
 
 clearcache() {
-echo -e "\e[44m Clear cache ...                                \e[0m" >&2
+echo -e "\e[44m Clear cache ...   \e[0m" >&2
 cat /proc/sys/vm/drop_caches
-echo -e '\e[93m'
+#echo -e '\e[93m'
 sync && echo 3 > /proc/sys/vm/drop_caches
-echo -e '\e[0m'
+#echo -e '\e[0m'
 cat /proc/sys/vm/drop_caches
 }
 
