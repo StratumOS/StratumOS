@@ -111,23 +111,6 @@ show_info () {
   tput setaf 3; echo -e "Done ... \e[0m"
 }
 
-init_old () {
-  if [[ -s ./$CONF && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; then
-    source ./$CONF
-    echo -e "\e[42m\e[30m OK \e[0m\e[32m ready to install!\e[0m"
-  else
-    mkdir $HOME/.stratum 2>/dev/null
-    mkdir /stratum 2>/dev/null
-    if ! wget -nv -O ./$CONF --no-check-certificate $URL_01/$CONF; then
-      echo -e "\e[101m\e[30m ERROR: there is no file \e[0m\e[34m"$CONF"\e[0m on the server or no response! exit ...\e[0m"
-      exit 1
-    else
-      echo -e "OK: download file "$CONF" from "$URL_01
-    fi
-    exit
-  fi
-}
-
 update_preferences () {
 cp $HOME/.bash_aliases $HOME/.bash_aliases.bak
 cp $HOME/.bashrc $HOME/.bashrc.bak

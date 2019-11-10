@@ -5,21 +5,29 @@
 
 SCRIPT=${0##*/}
 ARGS=${@}
+SCRIPT_PATH=`pwd`
 REPO_URL=http://stratumos.com # main repository server
 GIT_URL=https://github.com/StratumOS/StratumOS # main git server
 CONF=.stratum.conf # config file
 FUNC=.stratum.func # bash functions file
 STRATUM_DIR=/stratum
-source ./$CONF
-source ./$FUNC
+source $STRATUM_DIR/$CONF
+source $STRATUM_DIR/$FUNC
 
 init () {
 rm $STRATUM_DIR/$CONF; rm $STRATUM_DIR/$FUNC; echo "remove config & functions files and download from ..."
-while ! [[ -s ./$CONF && -s ./$FUNC && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; do
+while ! [[ -s $HOME/$CONF && -s $HOME/$FUNC && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; do
   mkdir $HOME/.stratum 2>/dev/null # user's stratum directory
   mkdir $STRATUM_DIR 2>/dev/null # main stratum directory
   cp ./stratum $STRATUM_DIR/stratum 2>/dev/null # copy from current path to main dir
-  rm ./stratum # remove from current path
+# remove file only if it is not in $STRATUM_DIR and it is not a symbolic link
+  if ! [[ $SCRIPT_PATH == "/stratum" ]] && [[ -L ./stratum ]] && [[ -d ./stratum ]]; then
+    rm ./stratum
+    echo -e "\e[101m\e[30m ! \e[0m\e[31m remove 'stratum' from current path\e[0m"
+  else
+    echo -e "\e[104m\e[30m - \e[0m\e[34m i'm not in /stratum path &\
+    ./stratum is not a directory or symlink ... OK \e[0m"
+  fi
   ln -s $STRATUM_DIR/stratum $HOME/stratum 2>/dev/null # symlink link
   ln -s $STRATUM_DIR/.stratum.conf $HOME/$CONF 2>/dev/null # symlink link
   ln -s $STRATUM_DIR/.stratum.func $HOME/$FUNC 2>/dev/null # symlink link
@@ -55,10 +63,10 @@ update () {
       echo -e '\e[32m remove existing oryginal ...\e[0m'
     rm -rf /stratum/stratum
       echo -e '\e[32m copy new one...\e[0m'
+    chmod +x /stratum/stratum.new
     cp /stratum/stratum.new /stratum/stratum 2>/dev/null
       echo -e '\e[32m chmod +x ...\e[0m'
-    chmod +x /stratum/stratum
-    echo -e $"\e[32m file: \"stratum\" updated...\e[0m" | logline
+      echo -e $"\e[32m file: \"stratum\" updated...\e[0m" | logline
   fi
   exit 0
 }
@@ -83,10 +91,12 @@ BACKUP=/var/backups/stratum
 mkdir $BACKUP 2>/dev/null
 
 info_bar () {
-echo -e "\e[42m\e[30mOK\e[0m\e[33m\e[32m SCRIPT=\e[0m\e[94m"$SCRIPT \
-"\e[0m\e[33m\e[32m ARGS=\e[0m\e[94m"$ARGS \
-"\e[0m\e[33m\e[32m USER=\e[0m\e[93m"$USER \
+echo -e "\e[42m\e[30mOK\e[0m\e[32m SCRIPT=\e[0m\e[94m"$SCRIPT \
+"\e[0m\e[32m ARGS=\e[0m\e[94m"$ARGS \
+"\e[0m\e[32m USER=\e[0m\e[93m"$USER \
 "\e[0m\e[32m REPO_URL=\e[0m"$REPO_URL "\e[32m LOGFILE=\e[0m"$LOGFILE
+echo -e "\e[0m\e[32m SCRIPT_PATH=\e[0m\e[94m$SCRIPT_PATH \e[0m\e[32m__dir=\e[0m\e[94m$__dir\
+\e[0m\e[32m __file=\e[0m\e[94m$__file \e[0m\e[32m__base=\e[0m\e[94m$__base \e[0m\e[32m__root=\e[0m\e[94m$__root\e[0m"
 echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" 2>/dev/null >> $LOGFILE
 }
 

@@ -17,11 +17,18 @@ StratumOS is widely used for build an simple bot doing specific tasks 24 hours 7
 wget stratumos.com/stratum && chmod +x ./stratum && ./stratum --init
 ```
 
-## Basic syntax
+## 🆑 Command Line Basic syntax
 
 ``` sh
-stratum [place:action] [--parameter:value]
+stratum [place:action] [--parameter=value]
 ```
+
+▶️ Generally: _stratum_ command executes specific _action_ in specific _place_ with certain _parameters_ and _values_. There is a default restriction to execute all available actions in this _place_.
+
+_stratum_ - shell script  
+_place_ - shell script, binary program, database engine
+
+🔜
 
 see more in [Wiki pages](https://github.com/StratumOS/StratumOS/wiki)
 
