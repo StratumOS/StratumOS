@@ -1,7 +1,7 @@
 # 💻 StratumOS
 ### 📱 remote controlled Linux system  
 ---  
-This repository includes a shell scripts for executing the bulk of the configuration and execute process.
+This repository includes a shell scripts for executing the bulk of the configuration and execution process.
 
 ---  
 

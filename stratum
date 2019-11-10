@@ -14,7 +14,7 @@ source ./$CONF
 source ./$FUNC
 
 init () {
-rm $STRATUM_DIR/$CONF; rm $STRATUM_DIR/$FUNC; echo "remove config & functions files and download again ..."
+rm $STRATUM_DIR/$CONF; rm $STRATUM_DIR/$FUNC; echo "remove config & functions files and download from ..."
 while ! [[ -s ./$CONF && -s ./$FUNC && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; do
   mkdir $HOME/.stratum 2>/dev/null # user's stratum directory
   mkdir $STRATUM_DIR 2>/dev/null # main stratum directory
