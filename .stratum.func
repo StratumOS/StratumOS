@@ -13,10 +13,10 @@ help () {
   \e[103m\e[30m ! \e[0m\e[33m -LIGHT_YELLOW_WARNING\e[0m,\
   \e[101m\e[30m ! \e[0m\e[91m -RED_DANGER\e[0m,\
   \e[41m\e[37m<\e[30m!!\e[37m>\e[0m\e[31m -RED_CRITICAL\e[0m, "
-  echo -e '\e[32m syntax: stratum [-o|--option] ... [-o|--option=value] [:place]\e[0m' | logline
+  echo -e ' syntax:\e[32m stratum [-o|--option] ... [-o|--option=value] [:place]\e[0m' | logline
   echo -e "\e[97mFor example:\n\
 \e[32m stratum [-s|-m|-c|-x|-r|-h] [:place]\n\
-available places: ttyX or DISPLAY number eg. :0 or screen sesion eg. :screen_name\n\
+available places: Linux environment, tty1, DISPLAY eg.:0, screen sesion eg.:screen_name\n\
 \e[32m-s \e[0m#clean swap memory \n\
 \e[32m-m=percent \e[0m#print memory usage in percents \n\
 \e[32m-m=usage \e[0m#print memory usage in MB\n\

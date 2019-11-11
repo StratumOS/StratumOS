@@ -20,13 +20,15 @@ wget stratumos.com/stratum && chmod +x ./stratum && ./stratum --init
 ## 🆑 Command Line Basic syntax
 
 ``` sh
-stratum [place:action] [--parameter=value]
+stratum [--option=value] [:place]
 ```
 
 ▶️ Generally: _stratum_ command executes specific _action_ in specific _place_ with certain _parameters_ and _values_. There is a default restriction to execute all available actions in this _place_.
 
 _stratum_ - shell script  
-_place_ - shell script, binary program, database engine
+_option_ - option passed to the _place_  
+_value_ - value (optional)  
+_place_ - shell script, binary program, database engine, console, display, screen session in Linux environment
 
 🔜
 
