@@ -129,7 +129,7 @@ case $i in
       root_check
       update
   	;;
-    --i|-init)
+    -i|-init)
       shift
       info_bar
       init
@@ -184,7 +184,7 @@ case $i in
       download_source_from_github
       show_info
     ;;
-    -h|--help)
+    -h|-\?|--help)
       echo "option help"
       shift # past argument=value
       info_bar
@@ -195,7 +195,7 @@ case $i in
       exit 1
     ;;
     *)
-      echo "unknown option ... "
+      echo -e "\e[44m\e[37m I \e[0m\e[94m unknown option:\e[33m ${@} \e[94m... try: stratum --help\e[0m"
     ;;
 esac
 done
