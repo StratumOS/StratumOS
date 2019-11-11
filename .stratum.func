@@ -197,3 +197,20 @@ pkill $FRAME
 echo -e "\e[42m   \e[0m\e[32m start:\e[33m FRAME=\e[0m$FRAME"
 export DISPLAY=$DSP && /opt/busy4me/$FRAME
 }
+
+stratum_logrotate () {
+echo -e "\e[44m ................... update logrotate \e[0m"
+rm /etc/logrotate.d/stratum 2>/dev/null
+mkdir /var/log/stratum 2>/dev/null
+cat > /etc/logrotate.d/stratum << EOF
+/var/log/stratum.log
+{
+	rotate 7
+	size 1M
+	missingok
+	dateext
+	copytruncate
+	olddir /var/log/stratum
+}
+EOF
+}

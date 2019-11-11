@@ -3,78 +3,90 @@
 # install as root: stratum --init
 # use as user: stratum [--help|-h|-?]
 
-SCRIPT=${0##*/}
-ARGS=${@}
-SCRIPT_PATH=`pwd`
-REPO_URL=http://stratumos.com # main repository server
-GIT_URL=https://github.com/StratumOS/StratumOS # main git server
-CONF=.stratum.conf # config file
-FUNC=.stratum.func # bash functions file
-STRATUM_DIR=/stratum
-source $STRATUM_DIR/$CONF
-source $STRATUM_DIR/$FUNC
+script=${0##*/}
+args=${@}
+script_path=`pwd`
+repo_url=http://stratumos.com # main repository server
+git_url=https://github.com/StratumOS/StratumOS # main git server
+conf_file=.stratum.conf # config file
+func_file=.stratum.func # bash functions file
+stratum_dir=/stratum
+source $stratum_dir/$conf_file
+source $stratum_dir/$func_file
+
+touch /var/log/stratum.log 2>/dev/null; chmod 666 /var/log/stratum.log 2>/dev/null | logline
+log_file=/var/log/stratum.log
+backup_dir=/var/backups/stratum
+mkdir $backup_dir 2>/dev/null
 
 init () {
-rm $STRATUM_DIR/$CONF; rm $STRATUM_DIR/$FUNC; echo "remove config & functions files and download from ..."
-while ! [[ -s $HOME/$CONF && -s $HOME/$FUNC && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; do
+rm $stratum_dir/$conf_file; rm $stratum_dir/$func_file; echo "remove config & functions files and download from ..."
+while ! [[ -s $HOME/$conf_file && -s $HOME/$func_file && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; do
   mkdir $HOME/.stratum 2>/dev/null # user's stratum directory
-  mkdir $STRATUM_DIR 2>/dev/null # main stratum directory
-  cp ./stratum $STRATUM_DIR/stratum 2>/dev/null # copy from current path to main dir
-# remove file only if it is not in $STRATUM_DIR and it is not a symbolic link
-  if ! [[ $SCRIPT_PATH == "/stratum" ]] && [[ -L ./stratum ]] && [[ -d ./stratum ]]; then
+  mkdir $stratum_dir 2>/dev/null # main stratum directory
+  cp ./stratum $stratum_dir/stratum 2>/dev/null # copy from current path to main dir
+# remove file only if it is not in $stratum_dir and it is not a symbolic link
+  if ! [[ $script_path == "/stratum" ]] && [[ -L ./stratum ]] && [[ -d ./stratum ]]; then
     rm ./stratum
     echo -e "\e[101m\e[30m ! \e[0m\e[31m remove 'stratum' from current path\e[0m"
 #  else
 #    echo -e "\e[104m\e[30m - \e[0m\e[34m i'm not in /stratum path &\
 #    ./stratum is not a directory or symlink ... OK \e[0m"
   fi
-  ln -s $STRATUM_DIR/stratum $HOME/stratum 2>/dev/null # symlink link
-  ln -s $STRATUM_DIR/.stratum.conf $HOME/$CONF 2>/dev/null # symlink link
-  ln -s $STRATUM_DIR/.stratum.func $HOME/$FUNC 2>/dev/null # symlink link
-  ln -s $STRATUM_DIR/stratum /usr/bin/stratum 2>/dev/null # symlink link
-  if ! wget -nv -O /stratum/$CONF --no-check-certificate $REPO_URL/$CONF; then
-    echo -e "\e[101m\e[30m ERROR: there is no file \e[0m\e[34m"$CONF"\e[0m on the server" $REPO_URL\
+  ln -s $stratum_dir/stratum $HOME/stratum 2>/dev/null # symlink link
+  ln -s $stratum_dir/.stratum.conf $HOME/$conf_file 2>/dev/null # symlink link
+  ln -s $stratum_dir/.stratum.func $HOME/$func_file 2>/dev/null # symlink link
+  ln -s $stratum_dir/stratum /usr/bin/stratum 2>/dev/null # symlink link
+  if ! wget -nv -O /stratum/$conf_file --no-check-certificate $repo_url/$conf_file; then
+    echo -e "\e[101m\e[30m ERROR: there is no file \e[0m\e[34m"$conf_file"\e[0m on the server" $repo_url\
     " or no response! exit ...\e[0m"
     exit 1
   else
-    echo -e "\e[100m\e[97m I \e[0m\e[97m OK: download file "$CONF" from \e[0m"$REPO_URL
+    echo -e "\e[100m\e[97m I \e[0m\e[97m OK: download file "$conf_file" from \e[0m"$repo_url
   fi
-  if ! wget -nv -O /stratum/$FUNC --no-check-certificate $REPO_URL/$FUNC; then
-    echo -e "\e[101m\e[30m ERROR: there is no file \e[0m\e[34m"$FUNC"\e[0m on the server" $REPO_URL\
+  if ! wget -nv -O /stratum/$func_file --no-check-certificate $repo_url/$func_file; then
+    echo -e "\e[101m\e[30m ERROR: there is no file \e[0m\e[34m"$func_file"\e[0m on the server" $repo_url\
     " or no response! exit ...\e[0m"
     exit 1
   else
-    echo -e "\e[100m\e[97m I \e[0m\e[97m OK: download file "$FUNC" from \e[0m"$REPO_URL
+    echo -e "\e[100m\e[97m I \e[0m\e[97m OK: download file "$func_file" from \e[0m"$repo_url
   fi
 done
 }
 
 update () {
-  echo -e "\e[44m start update file: "$SCRIPT" ...\e[0m\e[31m CAUTION! update itself ...  \e[0m" | logline
-  if ! wget -nv -O /stratum/stratum.new --no-check-certificate $REPO_URL/$SCRIPT; then
-    echo -e "\e[101m\e[30m ERROR: there is no file "stratum" on the server" $REPO_URL\
-    " or no response! check again ...\e[0m" | logline
+  if [ -z "$update_file" ]
+  then
+    update_file=stratum
+    echo -e '\e[31m CAUTION! update itself ...  \e[0m\e[0m'
+  else
+    update_file=$update_file
+  fi
+  echo -e "\e[44m start update file:\e[0m\e[33m $update_file\e[0m" | logline
+  if ! wget -nv -O /stratum/$update_file.new --no-check-certificate $repo_url/$update_file; then
+    echo -e "\e[41m\e[33m ERROR: there is no file \e[97m$update_file\e[41m\e[33m on the server\e[97m $repo_url\
+ \e[0mor no response!\e[0m check again ..." | logline
+    rm -rf /stratum/$update_file.new
     exit 1
   else
-    rm -rf $BACKUP/$SCRIPT.bak
+    rm -rf $backup_dir/$update_file.bak
       echo -e '\e[32m backup copy ...\e[0m'
-    cp /stratum/stratum $BACKUP/stratum.bak
-      echo -e '\e[35m backup file: '$BACKUP'/'$SCRIPT.bak' ...just in case...\e[0m'
+    cp /stratum/$update_file $backup_dir/$update_file.bak
+      echo -e '\e[35m backup file: '$backup_dir'/'$update_file.bak' ...just in case...\e[0m'
       echo -e '\e[32m remove existing oryginal ...\e[0m'
-    ln -s $BACKUP/$SCRIPT.bak /stratum/$SCRIPT.bak 2>/dev/null # symlink link
-    rm -rf /stratum/stratum
+    ln -s $backup_dir/$update_file.bak /stratum/$update_file.bak 2>/dev/null # symlink link
+    rm -rf /stratum/$update_file
       echo -e '\e[32m copy new one...\e[0m'
-    chmod +x /stratum/stratum.new
-    cp /stratum/stratum.new /stratum/stratum 2>/dev/null
+    chmod +x /stratum/$update_file.new
+    cp /stratum/$update_file.new /stratum/$update_file 2>/dev/null
       echo -e '\e[32m chmod +x ...\e[0m'
-      echo -e $"\e[32m file: \"stratum\" updated...\e[0m" | logline
+      echo -e $"\e[32m file: $update_file updated...\e[0m" | logline
   fi
-  exit 0
 }
 
 logline() {
     while IFS= read -r line; do
-        echo -e "$(date +%F' '%T) $SCRIPT - $line"; echo "$(date +%F' '%T) $SCRIPT - $line" >> $LOGFILE
+        echo -e "$(date +%F' '%T) $script - $line"; echo "$(date +%F' '%T) $script - $line" >> $log_file
     done
 }
 
@@ -86,19 +98,14 @@ if [ "$USER" != "root" ];then
 fi
 }
 
-touch /var/log/stratum.log 2>/dev/null; chmod 666 /var/log/stratum.log 2>/dev/null | logline
-LOGFILE=/var/log/stratum.log
-BACKUP=/var/backups/stratum
-mkdir $BACKUP 2>/dev/null
-
 info_bar () {
-echo -e "\e[42m\e[30mOK\e[0m\e[32m SCRIPT=\e[0m\e[94m"$SCRIPT \
-"\e[0m\e[32m ARGS=\e[0m\e[94m"$ARGS \
+echo -e "\e[42m\e[30mOK\e[0m\e[32m script=\e[0m\e[94m"$script \
+"\e[0m\e[32m args=\e[0m\e[94m"$args \
 "\e[0m\e[32m USER=\e[0m\e[93m"$USER \
-"\e[0m\e[32m REPO_URL=\e[0m"$REPO_URL "\e[32m LOGFILE=\e[0m"$LOGFILE
-echo -e "\e[0m\e[32m SCRIPT_PATH=\e[0m\e[94m$SCRIPT_PATH \e[0m\e[32m__dir=\e[0m\e[94m$__dir\
+"\e[0m\e[32m repo_url=\e[0m"$repo_url "\e[32m log_file=\e[0m"$log_file
+echo -e "\e[0m\e[32m script_path=\e[0m\e[94m$script_path \e[0m\e[32m__dir=\e[0m\e[94m$__dir\
 \e[0m\e[32m __file=\e[0m\e[94m$__file \e[0m\e[32m__base=\e[0m\e[94m$__base \e[0m\e[32m__root=\e[0m\e[94m$__root\e[0m"
-echo -e "\e[32m $(date +%F' '%T) $SCRIPT - Start script ...\e[0m" 2>/dev/null >> $LOGFILE
+echo -e "\e[32m $(date +%F' '%T) $script - Start script ...\e[0m" 2>/dev/null >> $log_file
 }
 
 export_path () {
@@ -129,15 +136,16 @@ case $i in
       root_check
       update
   	;;
-    -i|-init)
+    -i|--init)
       shift
       info_bar
       init
     ;;
     -u=*|--update=*)
-      file_update="${i#*=}"
-      echo -e "\e[44m update specific file: \e[0m file_update="$file_update
+      update_file="${i#*=}"
+      echo -e "\e[44m update specific file: \e[0m update_file=\e[33m$update_file\e[0m"
       shift # past argument=value
+      update
     ;;
     -m=*|--mem=*)
       mem="${i#*=}"
@@ -170,6 +178,9 @@ case $i in
       shift # past argument=value
 			xrestart
 		;;
+    --logrotate)
+    stratum_logrotate
+    ;;
     --full|--all|-0)
       info_bar
       export_path
@@ -183,6 +194,9 @@ case $i in
       clean_apt
       download_source_from_github
       show_info
+    ;;
+    -l|--log)
+    log
     ;;
     -h|-\?|--help)
       echo "option help"
