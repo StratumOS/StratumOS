@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # StratumOS - remote controlled linux system
 # install as root: stratum --init
-# use as user: stratum [--help|-h|-?]
+# use as root and user: stratum [-o|--option=value] [:place]
 
 script=${0##*/}
 args=${@}
@@ -72,7 +72,7 @@ update () {
   fi
   echo -e "\e[44m start update file:\e[0m\e[33m $update_file\e[0m" | logline
   if ! wget -nv -O /stratum/$update_file.new --no-check-certificate $repo_url/$update_file; then
-    echo -e "\e[41m\e[33m ERROR: there is no file \e[97m$update_file\e[41m\e[33m on the server\e[97m $repo_url\
+    echo -e "\e[41m\e[33m ERROR: there is no file \e[97m$repo_url$update_file\e[41m\e[33m on the server\e[97m \
  \e[0mor no response!\e[0m check again ..." | logline
     rm -rf /stratum/$update_file.new
     exit 1
@@ -88,7 +88,7 @@ update () {
     chmod +x /stratum/$update_file.new
     cp /stratum/$update_file.new /stratum/$update_file 2>/dev/null
       echo -e '\e[32m chmod +x ...\e[0m'
-      echo -e $"\e[32m file: $update_file updated...\e[0m" | logline
+      echo -e $"\e[32m file:\e[0m\e[33m $update_file\e[32m updated...\e[0m" | logline
   fi
 }
 
@@ -182,6 +182,9 @@ case $i in
 		;;
     --logrotate)
     stratum_logrotate
+    ;;
+    --check_distro)
+    check_distro
     ;;
     --full|--all|-0)
       info_bar
