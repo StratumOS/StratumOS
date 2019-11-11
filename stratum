@@ -14,8 +14,16 @@ stratum_dir=/stratum
 source $stratum_dir/$conf_file
 source $stratum_dir/$func_file
 
-touch /var/log/stratum.log 2>/dev/null; chmod 666 /var/log/stratum.log 2>/dev/null | logline
+logline() {
+    while IFS= read -r line; do
+        echo -e "$(date +%F' '%T) $script - $line"; echo "$(date +%F' '%T) $script - $line" >> $log_file
+    done
+}
+
+# create log_file
 log_file=/var/log/stratum.log
+touch $log_file 2>/dev/null; chmod 666 $log_file 2>/dev/null | logline
+# create backup dir
 backup_dir=/var/backups/stratum
 mkdir $backup_dir 2>/dev/null
 
@@ -84,12 +92,6 @@ update () {
   fi
 }
 
-logline() {
-    while IFS= read -r line; do
-        echo -e "$(date +%F' '%T) $script - $line"; echo "$(date +%F' '%T) $script - $line" >> $log_file
-    done
-}
-
 root_check () {
 if [ "$USER" != "root" ];then
 		echo -e "\e[31mRun this script as root! exit...\e[0m" | logline; exit
@@ -149,7 +151,7 @@ case $i in
     ;;
     -m=*|--mem=*)
       mem="${i#*=}"
-      echo "mem="$mem
+#      echo "mem="$mem
       shift # past argument=value
       memcheck
     ;;
@@ -196,6 +198,12 @@ case $i in
       show_info
     ;;
     -l|--log)
+    log
+    ;;
+    -l=*|--log=*)
+    log_date="${i#*=}"
+    echo "log_date="$log_date
+    shift # past argument=value
     log
     ;;
     -h|-\?|--help)

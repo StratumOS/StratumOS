@@ -214,3 +214,23 @@ cat > /etc/logrotate.d/stratum << EOF
 }
 EOF
 }
+
+log () {
+  case $log_date in
+    today)
+    log_time=$(echo "$(date +%F)")
+    ;;
+    yesterday)
+    log_time=$(echo "$(date -d yesterday +%F)")
+    ;;
+    "")
+    log_time=$(echo "$(date -d today +%F)")
+    ;;
+    *)
+    log_time=$(date -d "$log_date" '+%F')
+    echo -e "  \e[100m\e[97m I \e[0m\e[97m log_time=$log_time ... default\e[0m"
+    ;;
+  esac
+  cat $log_file | grep $log_time
+  echo -e "  \e[100m\e[97m I \e[0m\e[97m ... this is log $log_file $log_date \e[0m"
+}
