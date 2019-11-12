@@ -95,14 +95,19 @@ update_stratum () {
 
 # update any file from stratum
 update () {
-  if [ -z "$update_file" ]
-  then
-    update_file=/stratum/stratum
-    echo -e '\e[31m CAUTION! update itself ...  \e[0m\e[0m'
-  else
-    update_file=$update_file
-  fi
-  echo -e "\e[44m start update file:\e[0m\e[33m $update_file\e[0m" | logline
+  case $update_file in
+    'stratum'|'')
+      update_file="/stratum/stratum"
+      echo -e '\e[31m CAUTION! update itself ...  \e[0m\e[0m'
+    ;;
+    '.stratum.conf')
+      update_file="/stratum/.stratum.conf"
+    ;;
+    '.stratum.func')
+      update_file="/stratum/.stratum.func"
+    ;;
+  esac
+    echo -e "\e[44m start update file:\e[0m\e[33m $update_file\e[0m" | logline
   if ! wget -nv -O $update_file.new --no-check-certificate $repo_url/node$update_file; then
     echo -e "\e[41m\e[33m ERROR: there is no file \e[97m$repo_url$update_file\e[41m\e[33m on the server\e[97m \
  \e[0mor no response!\e[0m check again ..." | logline
