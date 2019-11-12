@@ -24,7 +24,7 @@ logline() {
 log_file=/var/log/stratum.log
 touch $log_file 2>/dev/null; chmod 666 $log_file 2>/dev/null | logline
 # create backup dir
-backup_dir=/var/backups/stratum
+backup_dir=/var/backups
 mkdir $backup_dir 2>/dev/null
 
 init () {
@@ -32,6 +32,7 @@ rm $stratum_dir/$conf_file; rm $stratum_dir/$func_file; echo "remove config & fu
 while ! [[ -s $HOME/$conf_file && -s $HOME/$func_file && -d $HOME/.stratum && -d /stratum && -s /stratum/stratum ]]; do
   mkdir $HOME/.stratum 2>/dev/null # user's stratum directory
   mkdir $stratum_dir 2>/dev/null # main stratum directory
+  ln -s /var/backups $stratum_dir/backups 2>/dev/null # main stratum directory
   cp ./stratum $stratum_dir/stratum 2>/dev/null # copy from current path to main dir
 # remove file only if it is not in $stratum_dir and it is not a symbolic link
   if ! [[ $script_path == "/stratum" ]] && [[ -L ./stratum ]] && [[ -d ./stratum ]]; then
@@ -109,16 +110,15 @@ update () {
     exit 1
   else
     rm -rf $backup_dir/$update_file.bak
-      echo -e "\e[32m backup copy ...\e[0m"
+      echo -e "\e[32m backup copy... to backup_dir=$backup_dir\e[0m"
     cp $update_file $backup_dir$update_file.bak
       echo -e "\e[35m backup file: $backup_dir$update_file.bak ...just in case...\e[0m"
       echo -e "\e[32m remove existing oryginal ...\e[0m"
-    ln -s $backup_dir$update_file.bak $update_file.bak 2>/dev/null # symlink link
     rm -rf $update_file
-      echo -e '\e[32m copy new one...\e[0m'
-    chmod +x $update_file.new
-    cp $update_file.new $update_file 2>/dev/null
       echo -e '\e[32m chmod +x ...\e[0m'
+    chmod +x $update_file.new
+      echo -e '\e[32m copy new one...\e[0m'
+    cp $update_file.new $update_file
       echo -e "\e[32m file:\e[0m\e[33m $update_file\e[32m updated...\e[0m" | logline
   fi
 }
