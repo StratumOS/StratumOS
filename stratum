@@ -34,7 +34,7 @@ while ! [[ -s $HOME/$conf_file && -s $HOME/$func_file && -d $HOME/.stratum && -d
   mkdir $stratum_dir 2>/dev/null # main stratum directory
   ln -s /var/backups $stratum_dir/backups 2>/dev/null # main stratum directory
   cp ./stratum $stratum_dir/stratum 2>/dev/null # copy from current path to main dir
-# remove file only if it is not in $stratum_dir and it is not a symbolic link
+# remove file only if it is not in $stratum_dir, not a symbolic link and isn't a directory
   if ! [[ $script_path == "/stratum" ]] && [[ -L ./stratum ]] && [[ -d ./stratum ]]; then
     rm ./stratum
     echo -e "\e[101m\e[30m ! \e[0m\e[31m remove 'stratum' from current path\e[0m"
@@ -61,36 +61,6 @@ while ! [[ -s $HOME/$conf_file && -s $HOME/$func_file && -d $HOME/.stratum && -d
     echo -e "\e[100m\e[97m I \e[0m\e[97m OK: download file "$func_file" from \e[0m"$repo_url
   fi
 done
-}
-
-update_stratum () {
-  if [ -z "$update_file" ]
-  then
-    update_file=stratum
-    echo -e '\e[31m CAUTION! update itself ...  \e[0m\e[0m'
-  else
-    update_file=$update_file
-  fi
-  echo -e "\e[44m start update file:\e[0m\e[33m $update_file\e[0m" | logline
-  if ! wget -nv -O /stratum/$update_file.new --no-check-certificate $repo_url/$update_file; then
-    echo -e "\e[41m\e[33m ERROR: there is no file \e[97m$repo_url$update_file\e[41m\e[33m on the server\e[97m \
- \e[0mor no response!\e[0m check again ..." | logline
-    rm -rf /stratum/$update_file.new
-    exit 1
-  else
-    rm -rf $backup_dir/$update_file.bak
-      echo -e '\e[32m backup copy ...\e[0m'
-    cp /stratum/$update_file $backup_dir/$update_file.bak
-      echo -e '\e[35m backup file: '$backup_dir'/'$update_file.bak' ...just in case...\e[0m'
-      echo -e '\e[32m remove existing oryginal ...\e[0m'
-    ln -s $backup_dir/$update_file.bak /stratum/$update_file.bak 2>/dev/null # symlink link
-    rm -rf /stratum/$update_file
-      echo -e '\e[32m copy new one...\e[0m'
-    chmod +x /stratum/$update_file.new
-    cp /stratum/$update_file.new /stratum/$update_file 2>/dev/null
-      echo -e '\e[32m chmod +x ...\e[0m'
-      echo -e $"\e[32m file:\e[0m\e[33m $update_file\e[32m updated...\e[0m" | logline
-  fi
 }
 
 # update any file from stratum

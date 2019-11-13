@@ -1,6 +1,7 @@
-# 💻 StratumOS
+# 💻 StratumOS  
 ### 📱 remote controlled Linux system  
----  
+#### (2018.01 - _alpha release_)
+---   
 This repository includes a shell scripts for executing the bulk of the configuration and execution process.
 
 ---  
@@ -43,3 +44,5 @@ see more in [Wiki pages](https://github.com/StratumOS/StratumOS/wiki)
 | /node/stratumos/bin/ | - | /usr/bin/stratumos  | executive script | ☑️
 | /node/etc/stratumos.conf | - | /usr/bin/stratumos  | config file | ☑️
 | /node/etc/stratumos.json | - | /usr/bin/stratumos  | json file | ☑️
+
+This document is in a DRAFT status.
