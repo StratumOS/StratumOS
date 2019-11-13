@@ -12,10 +12,10 @@ stratumos_user=vi
 cd /
 mkdir /stratumos
 
-wget https://github.com/StratumOS/StratumOS/archive/master.zip &&
-unzip -o ./master.zip &&
-rm ./master.zip &&
-cd stratumos-master &&
+wget https://github.com/StratumOS/StratumOS/archive/master.zip
+unzip -o ./master.zip
+rm ./master.zip
+cd StratumOS-master
 
 # install screen strace
 apt -y install screen
