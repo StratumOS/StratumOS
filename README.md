@@ -2,7 +2,7 @@
 ### 📱 remote controlled Linux system  
 #### (2018.01 - _alpha release_)
 ---   
-This repository includes a shell scripts for executing the bulk of the configuration and execution process.
+This repository includes a shell scripts for executing the bulk of the configuration process.
 
 ---  
 
