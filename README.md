@@ -5,8 +5,11 @@
 This repository includes a shell scripts for executing the bulk of the configuration process.
 
 ---  
+[Stratum OS]: http://stratumos.com
+[StratumOS]: http://stratumos.com
 
-StratumOS is an operating system managed thru internet website panel (UI) and smartphone App, based on standard Linux Distribution.  
+[StratumOS] is an operating system managed thru internet website panel (UI) and smartphone App, based on standard Linux Distribution. The StratumOS runs complex stream of commands with visual monitoring interface so the user can see what it's doing at the moment. In real time you can see what is going on in the process.  
+
 By design, StratumOS operation is very simple for the user and does not require advanced IT knowledge.  
 Just "As it's set up, it does what you tell him until switch off".  
 The system has a standard minimalistic file system and maintains the least amount of necessary packages.  
@@ -16,6 +19,7 @@ Plugins can be written by both beginners and advanced developers.
 We follow behind the vision "Amplify the intelligence and impact of every IT professional on the planet".  
 
 StratumOS is widely used for build an simple bot doing specific tasks 24 hours 7 days a week, and also to build advanced automatic system with Artificial Inteligence implemented.  
+Thanks to implemented Artificial Inteligence it's perfectly simulates human movements and behavior so it's not recognized by internet anti-bots. For more natural behavior, he uses standard applications and programs.
 
 # How to install
 ``` sh
