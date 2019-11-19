@@ -6,8 +6,12 @@ This repository includes a shell scripts for executing the bulk of the configura
 
 ---  
 
-StratumOS is an operating system managed thru internet website panel and smartphone App, based on standard Linux Distribution. One of the main goal is that, the StratumOS could be fully automated and independent system but integrated with global network at the same time. It is secure and has fully implemented modern encryption mechanisms.
-The modular StratumOS can be supplemented by adding plugins written in various programming languages, e.g. C, C++, Python, Go, Perl and others used on Linux platform.
+StratumOS is an operating system managed thru internet website panel (UI) and smartphone App, based on standard Linux Distribution.
+By design, StratumOS operation is very simple for the user and does not require advanced IT knowledge.
+Just "As it's set up, it does what you tell him until switch off"
+The system has a standard minimalistic file system and maintains the least amount of necessary packages.
+StratumOS is fully automated and independent system, mostly used for internet related tasks. It is secure and has fully implemented modern encryption mechanisms.
+The modular StratumOS structure uses standard Linux applications and can be supplemented by adding plugins written in various programming languages, e.g. C, C++, Python, Go, Perl and others used on Linux platform.
 Plugins can be written by both beginners and advanced developers.
 We follow behind the vision "Amplify the intelligence and impact of every IT professional on the planet".  
 
