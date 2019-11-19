@@ -7,7 +7,7 @@ This repository includes a shell scripts for executing the bulk of the configura
 ---  
 
 StratumOS is an operating system managed thru internet website panel (UI) and smartphone App, based on standard Linux Distribution.  
-By design, StratumOS operation is very simple for the user and does not require advanced IT knowledge.
+By design, StratumOS operation is very simple for the user and does not require advanced IT knowledge.  
 Just "As it's set up, it does what you tell him until switch off".  
 The system has a standard minimalistic file system and maintains the least amount of necessary packages.  
 StratumOS is fully automated and independent system, mostly used for internet related tasks. It is secure and has fully implemented modern encryption mechanisms.  
