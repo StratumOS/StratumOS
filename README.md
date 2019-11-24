@@ -22,6 +22,7 @@ StratumOS is widely used for build an simple bot doing specific tasks 24 hours 7
 Thanks to implemented Artificial Inteligence it's perfectly simulates human movements and behavior so it's not recognized by internet anti-bots. For more natural behavior, he uses standard applications and programs.
 
 # How to install
+Download stratum and run as root:
 ``` sh
 wget stratumos.com/stratum && chmod +x ./stratum && ./stratum --init
 ```
@@ -29,10 +30,10 @@ wget stratumos.com/stratum && chmod +x ./stratum && ./stratum --init
 ## 🆑 Command Line Basic syntax
 
 ``` sh
-stratum [--option=value] [:place]
+stratum [--option=value]... [:place]
 ```
 
-▶️ Generally: _stratum_ command executes specific _action_ in specific _place_ with certain _parameters_ and _values_. There is a default restriction to execute all available actions in this _place_.
+▶️ Generally: _stratum_ command executes specific _action_ in specific _place_ with certain _options_ and _values_. There is a default restriction to execute all available actions in this _place_.
 
 _stratum_ - shell script  
 _option_ - option passed to the _place_  
@@ -43,14 +44,15 @@ _place_ - shell script, binary program, database engine, console, display, scree
 
 see more in [Wiki pages](https://github.com/StratumOS/StratumOS/wiki)
 
-# Files content
+# Main files content
 
 | File | Alias | Symlink | Description | |
 |---|---|:---:|:---:|:---:|
-| install.sh | - | - | installation script |
-| /node/stratumos | st | /usr/bin/stratumos  | executive script | ☑️
-| /node/stratumos/bin/ | - | /usr/bin/stratumos  | executive script | ☑️
-| /node/etc/stratumos.conf | - | /usr/bin/stratumos  | config file | ☑️
-| /node/etc/stratumos.json | - | /usr/bin/stratumos  | json file | ☑️
+| /stratum | str | /usr/bin/stratum  | main executive script | ☑️
+| /.stratum.conf | - | -  | configuration file | ☑️
+| /.stratum.func | - | -  | file with functions | ☑️
+| /node/ | - | -  | system directory | ☑️
+| /node/home | - | -  | home directory | ☑️
+| /node/root | - | -  | root directory | ☑️
 
 This document is in a DRAFT status.
