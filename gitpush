@@ -1,50 +1,146 @@
 #!/usr/bin/env bash
 # one command line quick commit, comment and push directly to the Github.com master branch
 # author: Dariusz Porczyński
+#source ../lib/emoji-ico-01-people
+#source ../lib/emoji-ico-02-nature
+#source ../lib/emoji-ico-03-objets
+#source ../lib/emoji-ico-04-places
+#source ../lib/emoji-ico-05-symbols
 
-gu=$(echo $(cat ./.git/config))
-case $gu in
-  *github.com:* )
-  gu=$(echo $(cat ./.git/config) | sed 's/^.*github.com://' | sed 's/\/.*//')
+emoji_select () {
+  emoji=$(shuf -n 1  ./lib/emoji-ico-06-github)
+}
+
+username_get () {
+  gu=$(echo $(cat ./.git/config))
+  case $gu in
+    *github.com:* )
+    gu=$(echo $(cat ./.git/config) | sed 's/^.*github.com://' | sed 's/\/.*//')
+    ;;
+    *github.com/* )
+    gu=$(echo $(cat ./.git/config) | sed 's/^.*github.com\///' | sed 's/\/.*//')
+    ;;
+  esac
+
+  echo -e "\e[95m Press ENTER if username is correct or type correct one\n\
+  Current username: \e[33m"$gu"\e[0m"
+  read guser
+  if [ -z "$guser" ]
+  then
+    guser=$gu
+  fi
+  echo -e "\e[30m\e[42m OK \e[0m\e[95m Github user name is:\e[33m"$guser"\e[0m"
+}
+
+remote_get () {
+  re="origin"
+  echo -e "\e[95m Press ENTER if remote name is correct or type correct one\n\
+  Current remote name: \e[33m"$re"\e[0m"
+  read remote
+
+  if [ -z "$remote" ]
+  then
+    remote=$re
+  fi
+  echo -e "\e[30m\e[42m OK \e[0m\e[95m remote name is:\e[33m"$remote"\e[0m"
+}
+
+git_push () {
+  git add .
+
+  repo=$(echo ${PWD/*\//})
+  branch=master
+  echo -e "\e[95mCurrent repository:\e[0m"$repo"\e[95m, branch:\e[0m"$branch"\e[95m, \
+  see changes below ... \e[0m"
+  git status
+  echo -e "\e[95m random emoji:\e[33m $emoji \e[95m, type your comment below ...\
+  or type \e[33m\"emoji\"\e[95m to select emoji category again ... \e[0m"
+  read comment
+  case $comment in
+    emoji)
+    $0
+    exit
+    ;;
+    *)
+    echo -e "Push to github with comment: $emoji $comment"
+    ;;
+  esac
+
+  git commit -m "$emoji $comment"
+  git remote rm $remote
+  git remote add $remote git@github.com:$guser/$repo
+
+  git push -u $remote master
+  echo -e "\e[30m\e[42m all done \e[0m bye!"
+}
+
+emoji_category_select () {
+  RANDOM=$$$(date +%s)
+  emoji_category=("github_emoji_select" "people_emoji_select" "nature_emoji_select"
+  "objects_emoji_select" "places_emoji_select" "symbols_emoji_select")
+  category_emoji_select=${emoji_category[$RANDOM % ${#emoji_category[@]}]}
+}
+
+github_emoji_select () {
+  github_emoji=(":atom:" ":basecamp:" ":basecampy:" ":bowtie:" ":electron:" ":feelsgood:"
+  ":finnadie:" ":goberserk:" ":godmode:" ":hurtrealbad:" ":neckbeard:" ":octocat:"
+  ":rage1:" ":rage2:" ":rage3:" ":rage4:" ":shipit:" ":squirrel:" ":suspect:"
+  ":trollface:")
+  emoji=${github_emoji[$RANDOM % ${#github_emoji[@]}]}
+}
+
+people_emoji_select (){
+  people_emoji=("😄" "😆" "😊" "😃" "☺️" "😏" "😍" "😘" "😚" "😳" "😌" "😆"
+  "😁" "😉" "😜" "😝" "😀" "😗" "😙" "😛" "😴" "😟" "😦" "😧" "😮" "😬"
+  "😕" "😯" "😑")
+  emoji=${people_emoji[$RANDOM % ${#people_emoji[@]}]}
+}
+
+nature_emoji_select () {
+  nature_emoji=("☀️" "☔️" "☁️" "❄️" "⛄️" "⚡️" "🌀" "🌁" "🌊" "🐱" "🐶" "🐭"
+  "🐹" "🐰" "🐺" "🐸" "🐯" "🐨" "🐻" "🐷" "🐽")
+  emoji=${nature_emoji[$RANDOM % ${#nature_emoji[@]}]}
+}
+
+objects_emoji_select () {
+  objects_emoji=("🎍" "💝" "🎎" "🎒" "🎓" "🎏" "🎆" "🎇" "🎐" "🎑" "🎃" "👻"
+  "🎅" "🎄" "🎁" "🔔")
+  emoji=${objects_emoji[$RANDOM % ${#objects_emoji[@]}]}
+}
+
+places_emoji_select () {
+  places_emoji=("🏠" "🏡" "🏫" "🏢" "🏣" "🏥" "🏦" "🏪" "🏩" "🏨" "💒" "⛪️")
+  emoji=${places_emoji[$RANDOM % ${#places_emoji[@]}]}
+}
+
+symbols_emoji_select () {
+  symbols_emoji=("💲" "©️" "®️" "™️" "❌" "❗️" "‼️" "⁉️" "⭕️" "✖️" "➕" "➖" "➗"
+  "💮" "💯" "✔️" "☑️" "🔘" "🔗" "➰" "〰️" "〽️" "🔱" "✅" "🔲" "🔳" "⚫️"
+  "⚪️" "🔴" "🔵" "🔷" "🔶" "🔹" "🔸" "🔺" "🔻")
+  emoji=${symbols_emoji[$RANDOM % ${#symbols_emoji[@]}]}
+}
+
+case $1 in
+  --no-emoji|-ne)
+  echo -e "===== run with no emoji added ====="
+  username_get
+  remote_get
+  git_push
   ;;
-  *github.com/* )
-  gu=$(echo $(cat ./.git/config) | sed 's/^.*github.com\///' | sed 's/\/.*//')
+  '')
+  echo -e "===== default run with no options, random emoji will be in comment :) ====="
+  emoji_category_select
+  echo -e "selected emoji category:\e[33m $category_emoji_select\e[0m"
+  "$category_emoji_select"
+  echo -e "selected emoji:\e[33m $emoji\e[0m"
+#  people_emoji_select
+  username_get
+  remote_get
+  git_push
+  ;;
+  *)
+  echo -e "\e[91m bad option:\e[33m $1\e[0m ... run with no option or brak with Ctrl+c ..."
+  $0
+  exit
   ;;
 esac
-
-echo -e "\e[95m Press ENTER if username is correct or type correct one\n\
-Current username: \e[33m"$gu"\e[0m"
-read guser
-if [ -z "$guser" ]
-then
-  guser=$gu
-fi
-echo -e "\e[30m\e[42m OK \e[0m\e[95m Github user name is:\e[33m"$guser"\e[0m"
-
-re="origin"
-echo -e "\e[95m Press ENTER if remote name is correct or type correct one\n\
-Current remote name: \e[33m"$re"\e[0m"
-read remote
-
-if [ -z "$remote" ]
-then
-  remote=$re
-fi
-echo -e "\e[30m\e[42m OK \e[0m\e[95m remote name is:\e[33m"$remote"\e[0m"
-
-git add .
-
-repo=$(echo ${PWD/*\//})
-branch=master
-echo -e "\e[95mCurrent repository:\e[0m"$repo"\e[95m, branch:\e[0m"$branch"\e[95m, \
-see changes below ... \e[0m"
-git status
-echo -e "\e[95m and type your comment below ...\e[0m"
-read comment
-
-git commit -m "$comment"
-git remote rm $remote
-git remote add $remote git@github.com:$guser/$repo
-
-git push -u $remote master
-echo -e "\e[30m\e[42m all done \e[0m bye!"
